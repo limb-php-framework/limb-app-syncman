@@ -1,0 +1,26 @@
+<form:errors target='fields_errors'>
+<fetch using='{LPKG_WEB_APP_DIR}/src/fetcher/lmbMessageBoxErrorsFetcher' target='general_errors' />
+
+<list:list id='fields_errors'>
+<table>
+<list:ITEM >
+    <tr valign="top">
+      <td width="20%">&nbsp;</td>
+      <td width="80%"><FONT COLOR="RED">{$ErrorMessage}</FONT></td>
+    </tr>
+</list:ITEM>
+</table>
+</list:list>
+
+<list:list id='general_errors'>
+<table>
+<list:ITEM>
+    <tr valign="top">
+      <td width="20%">&nbsp;</td>
+      <td width="80%"><FONT COLOR="RED">{$ErrorMessage}</FONT></td>
+    </tr>
+</list:ITEM>
+</table>
+</list:list>
+
+

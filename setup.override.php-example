@@ -1,0 +1,9 @@
+<?php
+/*restore_include_path();
+set_include_path(dirname(__FILE__) . '/' . PATH_SEPARATOR .
+                 'd:/var/dev/limb/3.x/' . PATH_SEPARATOR .
+                 get_include_path());*/
+
+set_time_limit(0);
+
+?>

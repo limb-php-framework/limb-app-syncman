@@ -1,0 +1,29 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Form Tag Example</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+</head>
+<body>
+<h1 align="center">Form Tag Example</h1>
+
+<h2>Description:</h2>
+This page demonstrates how to use form tag. Note &lt;form&gt; tag **runat=server** attribute.
+<P/>After you submit the form, your text will appear above the form.
+
+<core:optional for='text'>
+<p/>You typed: <b>{$text}</b>
+</core:optional>
+
+<form name='my_form' runat='server' method='GET'>
+Type here: <input type='text' name='my_input'>
+
+<input type='submit' name='button' value='Send!'>
+</form>
+
+<h2>The source file</h2>
+
+<core:include file='1/page.html' source>
+
+</body>
+</html>

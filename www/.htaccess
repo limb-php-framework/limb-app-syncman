@@ -1,0 +1,15 @@
+Allow from all
+
+php_value output_buffering "0"
+php_value implicit_flush "1"
+php_value display_errors "0"
+
+RewriteEngine On
+
+RewriteCond %{REQUEST_URI} !.*\.(js|ico|swf|css|htm|html|jpg|jpeg|gif|png)$
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-s
+RewriteCond %{REQUEST_FILENAME} !-l
+RewriteRule ^(.+)$ /index.php?%{QUERY_STRING} [L]
+

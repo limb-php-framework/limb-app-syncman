@@ -1,0 +1,11 @@
+0.1.1alpha - 16 February 2007 (r5029)
+==================================================
+
+-- moving all contents of util.inc.php into common.inc.php
+-- tests are more isolated
+
+
+0.1.0alpha - 13 December 2006 (r4537)
+==================================================
+
+-- Initial release of this package.

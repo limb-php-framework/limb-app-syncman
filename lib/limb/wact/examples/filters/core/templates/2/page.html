@@ -1,0 +1,40 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Core Filters Example</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+</head>
+<body>
+<h1 align="center">Core filters Example</h1>
+
+<h2>Description:</h2>
+This page demonstrates how to use several core filters such as:
+<ul>
+  <li>const</li>
+  <li>url</li>
+  <li>hex</li>
+  <li>notags</li>
+  <li>etc.</li>
+</ul>
+
+<h2>Const filter</h2>
+
+<core:literal>{$'MY_TESTING_TEMPLAE_EXAMPLE_CONSTANT'|const} =</core:literal> {$'MY_TESTING_TEMPLAE_EXAMPLE_CONSTANT'|const}
+
+<h2>Url filter</h2>
+
+<core:literal>{$my_url|url} = </core:literal> {$my_url|url} (real value is {$my_url})
+
+<h2>Notags filter</h2>
+
+<core:literal>{$my_text|notags} = </core:literal> {$my_text|notags} (real value is {$my_text})
+
+<h2>Hex filter</h2>
+
+<core:literal>{$my_hex|hex} = </core:literal> {$my_hex|hex} (real value is {$my_hex})
+
+<h2>The source file</h2>
+<core:include file='2/page.html' source>
+
+</body>
+</html>

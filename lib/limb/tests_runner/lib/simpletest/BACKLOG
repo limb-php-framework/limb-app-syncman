@@ -1,0 +1,37 @@
+BACKLOG
+This is backed up stuff that defines the 1.0.1 release.
+
+$Id: BACKLOG,v 1.7 2006/03/29 01:47:34 lastcraft Exp $
+
+Unit tester
+-----------
+Add expectException() and expectError().
+
+Reporter
+--------
+
+Mock objects
+------------
+Optionally separate setting of expectations from mocks (8).
+
+Parser
+------
+
+Browser
+-------
+Add a file() loading command (4).
+Change getUrls() to return more information (2).
+
+Web tester
+----------
+
+Documentation
+-------------
+Extension docs (1).
+Integrate SpikeSource docs (4).
+Write Eclipse plug-in guide (4).
+Add page for projects that use or extend SimpleTest (2).
+
+Build
+-----
+Integrate German documentation (2).

@@ -1,0 +1,11 @@
+0.1.1 - 16 February 2007 (r5042)
+==================================================
+
+-- obsolete lmbToolkit :: autoload(...) removed
+-- .init.php including limb/core package support added
+-- initial PhpDocs
+
+0.1.0 - 14 December 2006
+==================================================
+
+- Initial release of this package.

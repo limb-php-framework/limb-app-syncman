@@ -1,0 +1,30 @@
+<core:WRAP file="page.html" in="page_placeholder">
+
+<h1>Main page - <a href="/news/">Newsline</a></h1>
+<hr />
+
+<active_record:fetch class_path='src/model/News' target="last_news" order='date=DESC' limit='3'/>
+
+<center>
+<list:LIST id="last_news">
+  <table>
+  <caption>Last News</caption>
+  <list:ITEM>
+  <tr>
+    <td rowspan="2"><strong>{$date}</strong></td>
+    <th>{$title}</th>
+  </tr>
+  <tr>
+    <td>
+      {$annotation}
+       <route_url params='controller:news,action:detail,id:{$id}'>more...</route_url>
+    </td>
+  </tr>
+  </list:ITEM>
+  </table>
+</list:LIST>
+
+<route_url params='controller:news'>All news...</route_url>
+</center>
+
+</core:wrap>

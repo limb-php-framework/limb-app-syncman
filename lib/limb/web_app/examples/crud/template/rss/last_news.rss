@@ -1,0 +1,24 @@
+<!--l version="1.0" encoding="utf-8"-->
+<!DOCTYPE rss [<!ENTITY % HTMLlat1 PUBLIC "-//W3C//ENTITIES Latin 1 for XHTML//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml-lat1.ent">]>
+<rss version="0.92" xml:base="http://tutorial.dbrain.bit">
+
+<channel>
+ <title>YourDomain.com last news</title>
+ <language>en</language>
+
+<list:list id='last_news'>
+ <list:item>
+  <item>
+   <title>{$title}</title>
+   <link>{$path}</link>
+   <description>
+      {$annotation}
+   </description>
+   <pubDate>
+      {$date}
+   </pubDate>
+ </item>
+  </list:item>
+</list:list>
+</channel>
+</rss>

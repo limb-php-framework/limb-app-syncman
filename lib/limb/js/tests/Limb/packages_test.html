@@ -1,0 +1,77 @@
+<html>
+<head>
+  <title>Limb Tests</title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+
+  <script src="../scriptaculous/lib/prototype.js" type="text/javascript"></script>
+  <script src="../scriptaculous/src/unittest.js" type="text/javascript"></script>
+  <link rel="stylesheet" href="../test.css" type="text/css" />
+
+  <script src="../../Limb.js" type="text/javascript"></script>
+  <script src="TestSourceFetcher.js" type="text/javascript"></script>
+</head>
+<body>
+<h1>Limb package management</h1>
+<p>
+  Tests for packages support.
+</p>
+
+<div id="testlog"></div>
+<div id="result"></div>
+
+<script type="text/javascript" language="javascript" charset="utf-8">
+// <![CDATA[
+  new Test.Unit.Runner({
+    tearDown: function()
+    {
+      Limb.Packages.flush();
+    },
+
+    testRequirePackage: function()
+    {
+      TestSourceFetcher.set('Foo.js', "Limb.require(\"Bar\");\n Foo = {};");
+      TestSourceFetcher.set('Bar.js', "Limb.require(\"Zoo\");\n Bar = {};");
+      TestSourceFetcher.set('Zoo.js', "Limb.require('Foo');\nLimb.require('Bar');\n Zoo = {};");
+
+      Limb.Packages.useSourceFetcher(TestSourceFetcher);
+      Limb.Packages.require('Foo');
+
+      this.assertNotNull(Foo);
+      this.assertNotNull(Bar);
+      this.assertNotNull(Zoo);
+    },
+
+    testRequireNestedPackages: function()
+    {
+      TestSourceFetcher.set('Foo.js', "Limb.namespace('Foo');\nLimb.require(\"Foo.Bar\");\n");
+      TestSourceFetcher.set('Foo/Bar.js', "Limb.namespace('Foo.Bar');\nLimb.require(\"Foo.Wow\");");
+      TestSourceFetcher.set('Foo/Wow.js', "Limb.namespace('Foo.Wow');\nLimb.require('Foo');");
+
+      Limb.Packages.useSourceFetcher(TestSourceFetcher);
+      Limb.Packages.require('Foo');
+
+      this.assertNotNull(Foo);
+      this.assertNotNull(Foo.Bar);
+      this.assertNotNull(Foo.Wow);
+    },
+
+    testRequirePackageUsingRealRequest: function()
+    {
+      Limb.Packages.useSourceFetcher(new Limb.Packages.SourceFetcher());
+      Limb.Packages.require('Foo');
+
+      this.assertNotNull(Foo);
+    },
+
+    testMakeNamespace: function()
+    {
+      Limb.namespace('Foo.Bar');
+      this.assertNotNull(Foo);
+      this.assertNotNull(Foo.Bar);
+      Foo = undefined;
+    }
+  });
+// ]]>
+</script>
+</body>
+</html>

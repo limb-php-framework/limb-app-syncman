@@ -1,0 +1,15 @@
+0.1.2alpha - 16 February 2007 (r5068)
+==================================================
+
+-- tests are more isolated
+-- initial PhpDocs
+
+0.1.1alpha - 16 December 2006 (r4582)
+==================================================
+
+-- cyclic package dependency removed.
+
+0.1.0alpha - 13 December 2006 (r4537)
+==================================================
+
+-- initial release of this package.

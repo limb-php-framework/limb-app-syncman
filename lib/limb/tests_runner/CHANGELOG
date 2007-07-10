@@ -1,0 +1,30 @@
+0.3.0alpha - 13 February 2007 (r5058)
+==================================================
+
+-- introducing new CLI interface: limb_unit which allows to run tests directly from file system. This interface also takes into account nested fixtures, init scripts, etc.
+-- lmbTestShellUI => lmbTreeTestShellUI
+-- lmbTestShellUI now allows to execute tests located in file system
+-- limb_unit.php script should be used for running tests within file system all other bin/* scripts removed
+-- limb_unit and limb_unit.bat are deployed into @php_dir@ during PEAR package deployment
+-- fixing compatibility issues with PHP-5.2
+
+0.2.0alpha - 13 December 2006 (r4538)
+==================================================
+
+-- conditional ignoring of directories added: if dir contains .ignore.php script inclusion of which returns true the directory is considered to be ignored
+-- lmbTestTreeDirNode includes .init.php if it finds it in the tests directory, this allows to have some initialization logic before tests execution, this feature shouldn't be used for fixtures!!!
+-- lmbTestShellUI :: browse(), :: perform() are now public
+-- test files filter and class format can be setup with new constants LIMB_TEST_RUNNER_FILE_FILTER and LIMB_TEST_RUNNER_CLASS_FORMAT respectively
+-- *.test.php filter added
+-- abstract lmbTestTreeNode :: createTestGroupWithoutChildren() added, it's used for wrapping child test case with parent cases when we don't need children
+-- lmbTestTreeNode refactored, template method _createTestGroupForWrapping added, this allowed to remove code duplication in wrapWithParentTestGroups in lmbTestTreeDirNode
+-- lmbTestTreeNode :: wrapWithParentTestGroups fixed: parent check happens right before calling $parent->wrapWithParentTestGroups, not in the beginning of a method
+-- experimental lmbTestTreeGlobNode added, it can collect a number of testing directories using glob patterns
+-- lmbTestShellUI,lmbTestWebUI accept optional $argv argument in constructor
+-- lmbTestWebUI :: perform(..), browse(..) are now public methods just like in lmbTestShellUI
+-- minimal improvement in web tests runner: making nice looking table with test groups/cases;
+
+0.1.0alpha - 19 April 2006
+==================================================
+
+-- initial release of this package.

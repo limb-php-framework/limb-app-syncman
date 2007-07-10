@@ -1,0 +1,69 @@
+/*page*/
+  html, body{width:100%;height:100%;}
+  body{background:#e3e3e3;padding:0; margin:0;}
+
+/*design*/
+  a img{border:0}
+
+/*navigation*/
+  a{text-decoration:underline; font: 8pt Tahoma, sans;color:#bd1a01;}
+  a:hover{text-decoration:none}
+  a:focus{ outline: none; }
+  
+  
+/*TAGS*/
+  h1{font: 2.2em "Times new roman"; color:#000; margin:0;padding: 0;}
+  h2{font:2.0em "Times New Roman";color:#000;margin:0;padding: 0;}
+  h3{font:1.8em "Times New Roman";color:#000;margin: 0;padding:0;}
+  h4{font:bold 1.6em "Times New Roman";color:#000;margin:0;padding: 0;}
+  dl, dt, dd, form {margin:0;padding: 0;}
+  p {margin: 0;padding:5px 0;}
+  ul {margin: 0;padding: 10px 20px;}
+  table {border-spacing: 0;border-collapse: collapse;}
+  table td {padding:0;}
+  fieldset {border:1px solid #bababa;margin:0 10px 20px;padding:5px 10px;}
+  legend {text-align:left;padding:0 5px 0 0;}
+
+
+/*FONT*/
+  body{font:62.5%/1.5 "Trebuchet MS"; color:#2a3f62}
+  table, td, th, ul {font-size: 1em;}
+  legend {font:bold 1.7em "Trebuchet MS";color:#2a3f62}
+  #list th {font:1.2em "Trebuchet MS";color:#fff;}
+  #list td{font:1.4em "Trebuchet MS"; color:#2a3f62}
+  #copyright {font:1em "Trebuchet MS";color:#fff;}
+  #list .project_name {font-weight:bold;}
+  .changed { color: red }
+  .info dt{font-weight: bold;color: grey;}
+  .not_changed { color: green }
+  .version {display:block;width:297px;text-align:right;position:absolute;top:67px}
+
+/*Misc*/
+  .info {display:none;text-align:left}
+  .selector {width:30px;}
+  .actions img {cursor:pointer}
+
+/*layout*/
+  #wrapper {min-height:100%;position:relative;}
+    *html #wrapper {height:100%;}
+  #content {padding:0 0 90px 0;}
+  
+  #head {background: #fff;margin:0 0 5px 0;}
+    #logo {margin: 17px 0 17px 47px;}
+    
+  #popup fieldset {height:85%}
+    #popup iframe {background: #fff;height:95%;}
+    #popup .content {background: #fff;height:95%;}
+
+  #list {border:0;width:100%;margin: 0 0 10px;}
+  #list th {background: #2a3f62 url(../images/bgr/th.gif) repeat-x center bottom;height:32px;vertical-align:top;padding: 2px 5px 10px;}
+  #list td {background: #fff;border:1px solid #d4d9e0;border-width:1px 0;text-align:center;padding: 7px 5px 5px;vertical-align:top}
+  #list tr.odd td{background: #F9F9F9;}
+  #list .project_name {text-align:left;}
+
+  #footer {background:#2a3f62;height:74px;position:absolute;bottom:0px;width:100%;}
+    #limb {float:right;margin:15px 0 0 30px;}
+    #bit {margin: 25px 30px 0px;float:right;}
+  
+  
+  

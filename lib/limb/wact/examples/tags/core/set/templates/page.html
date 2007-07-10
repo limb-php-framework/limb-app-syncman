@@ -1,0 +1,33 @@
+<core:SET title="Example of setting a variable at compile and at run time">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>{$title}</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+</head>
+<body>
+<h1 align="center">{$title}</h1>
+The title of this page is a <b>compile time</b> variable reference.
+
+<p/>But we can also use DBEs with core:set as well.
+
+<core:set second_title="{$other_title}">
+<h2>{$second_title}</h2>
+
+Second level title is a <b>run time</b> variable reference passed from php-script.
+
+<p/>DBEs can be complex
+
+<core:datasource>
+<core:set third_title="{$^other_title}">
+<h3>{$third_title}</h3>
+
+Third level title is a <b>run time</b> variable reference from parent datasource.
+</core:datasource>
+
+<h2>The source file</h2>
+
+<core:include file='page.html' source>
+
+</body>
+</html>

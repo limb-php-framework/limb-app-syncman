@@ -1,0 +1,7 @@
+To run the tests:
+
+1) create a new "limb" folder somewhere in your PHP include_path
+2) checkout LIMB TESTS_RUNNER package from
+  svn://svn.limb-project.com/limb/3.x/packages/tests_runner/trunk to that folder:
+  $ svn co svn://svn.limb-project.com/limb/3.x/packages/tests_runner/trunk limb/tests_runner
+3) run "php run.php -t /" command from wact/tests folder.
