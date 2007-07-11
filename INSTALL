@@ -1,0 +1,27 @@
+======================== Syncman - painless remote projects synchronization utility ========================
+
+1) Unpack the archive, for example in directory /var/www/syncman
+
+2) Make /var/www/syncman/var directory writable for web server:
+
+$ chmod 777 /var/www/syncman/var
+
+3) Create syncman VirtualHost in Apache config file(httpd.conf), something like this:
+
+<VirtualHost *>
+    DocumentRoot /var/www/syncman/www/
+    ServerName syncman
+    ErrorLog logs/syncman-error_log
+    CustomLog logs/syncman-access_log common
+</VirtualHost>
+
+4) Put "syncman" host name into /etc/hosts:
+
+127.0.0.1  syncman
+
+5) Restart Apache
+
+6) Open http://syncman in your browser, you should see a couple of test projects
+
+7) All projects settings are stored in "projects" directory of syncman application. You can copy "projects-examples" 
+  directory into "projects" directory in order to try some sample projects.
