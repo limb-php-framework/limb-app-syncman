@@ -25,3 +25,72 @@ $ chmod 777 /var/www/syncman/var
 
 7) All projects settings are stored in "projects" directory of syncman application. You can copy "projects-examples" 
   directory into "projects" directory in order to try some sample projects.
+
+8) Please note, in case you want to use passwordless ssh authentication based on public/private keys infrastructure 
+   you most probably want to use Apache Suexec module with PHP FastCgi(OpenSSH requires the process using keys for 
+   authentication to be owned by the very same user who owns the private key). 
+   
+   Here's a very quick howto(assuming you know how to obtain and install Suexec and FastCgi modules for Apache).
+
+   First let's configure global FastCgi settings(somewhere in the end of global httpd.conf configuration but before 
+   any virtual hosts):
+
+<IfModule !mod_fastcgi.c>
+  LoadModule fastcgi_module    modules/mod_fastcgi.so
+</IfModule>
+
+<IfModule mod_fastcgi.c>
+  AddHandler fastcgi-script .fcg .fcgi
+  FastCgiConfig -maxProcesses 3 -processSlack 1 -singleThreshold 3 -killInterval 300 -autoUpdate -idle-timeout 240 -pass-header HTTP_AUTHORIZATION
+  FastCgiIpcDir /tmp/fastcgi_ipc/
+  FastCgiSuexec /usr/sbin/suexec
+</IfModule>
+
+<Location /php-fastcgi/>
+  Options ExecCGI
+  SetHandler fastcgi-script
+</Location>
+
+    Now let's change syncman virtual host definition(please note, we're using 'syncman' user and 'users' group, which implies that 'syncman' user is
+    going to use its private key for passwordless authentication):
+
+<VirtualHost *>
+  DocumentRoot /var/www/syncman/www/
+  ServerName syncman
+  ErrorLog logs/syncman-error_log
+
+  <Directory /var/www/fcgi-bin/syncman/>
+      Options ExecCGI
+      SetHandler cgi-script
+  </Directory>
+
+  User syncman
+  Group users
+
+  ScriptAlias /php-fastcgi/ /var/www/fcgi-bin/syncman/
+  AddType application/x-httpd-fastphp .php
+  Action application/x-httpd-fastphp /php-fastcgi/php5-fcgi
+</VirtualHost>
+
+    Now we need to write php5-fcgi wrapper script in /var/www/fcgi-bin/syncman directory:
+
+#!/bin/sh
+PHPRC="/etc/php/cgi-php5/php.ini" #location of php.ini may differ on your server
+export PHPRC
+PHP_FCGI_CHILDREN=2
+export PHP_FCGI_CHILDREN
+PHP_FCGI_MAX_REQUESTS=5000
+export PHP_FCGI_MAX_REQUESTS
+exec /usr/lib/php5/bin/php-cgi #you may have different php cgi binary path
+
+    Don't forget to chmod +x on this script! 
+
+    Try restarting apache and browsing syncman web interface. Now if you try running "ps aux | grep syncman" you should see something like follows:
+
+$ ps aux | grep syncman
+syncman  14740  0.2  0.4  24892  4480 ?        Ss   15:36   0:00 /usr/lib/php5/bin/php-cgi
+syncman  14741  8.3  1.1  28796 10312 ?        S    15:36   0:00 /usr/lib/php5/bin/php-cgi
+syncman  14742  0.0  0.2  24892  2252 ?        S    15:36   0:00 /usr/lib/php5/bin/php-cgi
+
+    If it worked, congratulations, you did it ;)
+
