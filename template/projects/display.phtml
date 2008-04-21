@@ -1,0 +1,74 @@
+<html>
+<head>
+  <title>Syncman projects</title>
+  <meta http-equiv='Content-Type' content='text/html; charset=utf-8'/>
+  <link rel="stylesheet" href="/styles/main.css" type="text/css" />
+  <script src="/shared/js/prototype.js"></script>
+  <script src="/shared/js/Limb.js"></script>
+  <script src="/shared/js/Limb/browser.js"></script>
+  <script src="/shared/js/Limb/events.js"></script>
+  <script src="/shared/js/Limb/http.js"></script>
+  <script src="/shared/js/Limb/window.js"></script>
+  <script src="/shared/js/Limb/forms.js"></script>
+  <script src="/shared/js/Limb/form_elements.js"></script>
+  <script src="/shared/js/scriptaculous/scriptaculous.js"></script>
+  <script src="/js/jquery.js"></script>
+  <script src="/js/main.js"></script>
+  <script src="/js/JsHttpRequest.js"></script>
+  <script src="/js/getDetailForCategory.js"></script>
+</head>
+<body>
+
+  <div id="wrapper">
+
+    <div id="content">
+
+      <div id="head">
+        <img src="/images/logo.syncman.gif"  width='250' height='63' alt='SYNCMAN' id='logo'/>
+        <span class='version'><?php echo SYNCMAN_VERSION; ?></span>
+      </div>
+
+      {{list:list using="$#category" as="$item"}}
+      {{list:item}}
+
+      <?php if(isset($this->category_detail[$item->name]) && $this->category_detail[$item->name] == 1)  
+              $open = 1;
+            else
+              $open = 0;
+      ?>
+       <fieldset>
+         <legend>
+         <?php $state = $open == 0 ? 'open' : 'close'; ?>
+         <a href="{{route_url params='action:detail'}}?category={$item.name}"
+            id='{$item.name}_category_toggle' 
+            onclick="getDetailForCategory('{$item.name}_category'); return false;"
+            class="category">
+         <strong>Category '{$item.name}'</strong>
+         <img src="/images/icon/{$state}.gif"  width='11' height='11' alt='{$state}'/>
+         </a>
+         </legend>
+
+         <?php $state = $open == 0 ? 'none' : 'block'; ?>
+         <div id='{$item.name}_category' style="display: {$state};">
+         <?php if($open == 1) { ?>
+          <?php $this->item = $item; ?>
+          {{include file='projects/detail.phtml' /}}
+         <?php } ?>
+         </div>
+
+        </fieldset>
+
+      {{/list:item}}
+      {{/list:list}}
+
+    </div>
+
+    <div id="footer">
+      <a href="http://www.bit-creative.com/" target="_blank" title="BIT project" id='bit'><img src="/images/bit.gif"  onMouseOut="this.src='/images/bit.gif';" onMouseOver="this.src='/images/bit_hover.gif';" alt="BIT project" width="80" height="21"/></a>
+      <a href="http://www.limb-project.com" id='limb'><img src="/images/logo.limb.gif"  width='114' height='41' alt='LIMB'/></a>
+    </div>
+
+  </div>
+
+</body>
+</html>

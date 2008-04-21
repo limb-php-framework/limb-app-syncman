@@ -10,7 +10,9 @@
   a:hover{text-decoration:none}
   a:focus{ outline: none; }
   
-  
+  a.category{font:bold 1em "Trebuchet MS";color:#2a3f62;text-decoration:none}
+  a.project{font:bold 1em "Trebuchet MS";text-decoration:none}
+
 /*TAGS*/
   h1{font: 2.2em "Times new roman"; color:#000; margin:0;padding: 0;}
   h2{font:2.0em "Times New Roman";color:#000;margin:0;padding: 0;}
@@ -33,8 +35,8 @@
   #list td{font:1.4em "Trebuchet MS"; color:#2a3f62}
   #copyright {font:1em "Trebuchet MS";color:#fff;}
   #list .project_name {font-weight:bold;}
-  .changed { color: red }
   .info dt{font-weight: bold;color: grey;}
+  .changed { color: red }
   .not_changed { color: green }
   .version {display:block;width:297px;text-align:right;position:absolute;top:67px}
 

@@ -1,16 +1,20 @@
-jQuery(document).ready(function(){
+function on_load(){
+  jQuery(document).ready(function(){
+  
+    jQuery("tr.list:nth-child(odd)").addClass("odd");  
+    jQuery("tr.list").bind("mouseover", function(){
+            jQuery(this).find("td").css('backgroundColor','#e2e7ec');
+          });
+    jQuery("tr.list").bind("mouseout", function(){
+          if (jQuery(this).attr('class')== 'list odd') 
+            jQuery(this).find("td").css('backgroundColor','#F9F9F9');
+          else
+            jQuery(this).find("td").css('backgroundColor','#fff');
+          });
+  });
+}
 
-  jQuery("tr.list:nth-child(odd)").addClass("odd");  
-  jQuery("tr.list").bind("mouseover", function(){
-          jQuery(this).find("td").css('backgroundColor','#e2e7ec');
-         });
-  jQuery("tr.list").bind("mouseout", function(){
-        if (jQuery(this).attr('class')== 'list odd') 
-          jQuery(this).find("td").css('backgroundColor','#F9F9F9');
-        else
-          jQuery(this).find("td").css('backgroundColor','#fff');
-        });
-});
+on_load();
 
 function category_toggle (elem_selector){
   var elem = document.getElementById(elem_selector);

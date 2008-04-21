@@ -1,0 +1,61 @@
+<!-- Begin content -->
+<table cellpadding='0' cellspacing='0' class='status'>
+<tr>
+  <td id='status_text'>Synchronization...</td>
+  <td id='close_button'>
+    <a href="#" class="lbAction" rel="deactivate">
+      <input type='button' class='button' value='x' onclick='window.close();' />
+    </a>
+  </td>
+</tr>
+</table>
+<table cellpadding='0' cellspacing='0' border='0' width='100%' height='100%' class='main_panel'>
+<tr>
+  <td>
+    <div id='state'>Updating sources</div>
+    <div class='progress_bar_container'><div id='progress_bar'></div></div>
+    <div id='console' style='display: none'></div>
+  </td>
+</tr>
+</table>
+
+
+<!-- End content -->
+
+<script>
+  var params = {
+    'onReady': function ()
+    {
+      var status = document.getElementById('status_text');
+      status.innerHTML = 'Synchronization complete';
+      
+      var close_button = document.getElementById('close_button'); 
+      close_button.style.display = 'block';
+
+      var state = document.getElementById('state');  
+      state.innerHTML = 'Synchronization finished';
+
+      window.progress_bar.stop();
+    },
+
+    'onCommandPerformed': function()
+    {
+      window.current_state++;
+
+      var state = document.getElementById('state');  
+
+      switch(window.current_state)
+      {
+        case 2: state.innerHTML = 'Preparing project'; break;
+        case 3: state.innerHTML = 'Uploadind project to server'; break;
+        case 4: state.innerHTML = 'Clearing cache and updating database. Finishing installation.'; break;
+      }
+    }
+  };
+
+  new Ajax.Request('/projects/start_sync/{$#request.id}?sync_date={$#sync_date}', { method: 'get' } );
+  window.progress_bar = new ProgressBar('progress_bar');
+  window.console = new Console('console', '/projects/progress/{$#request.id}?sync_date={$#sync_date}', params);
+  window.current_state = 0;
+</script>
+

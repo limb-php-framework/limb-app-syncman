@@ -1,0 +1,45 @@
+<html>
+<head>
+  <title>Syncman projects</title>
+  <meta http-equiv='Content-Type' content='text/html; charset=utf-8'/>
+  <link rel="stylesheet" href="/styles/lightbox.css" type="text/css" />
+  <link rel="stylesheet" href="/styles/main.css" type="text/css" />
+  <script type="text/javascript" src="/js/prototype.js"></script>
+  <script type="text/javascript" src="/js/lightbox.js"></script>
+  <script type="text/javascript" src="/js/Console.js"></script>
+  <script type="text/javascript" src="/js/ProgressBar.js"></script>
+  <script type="text/javascript" src="/js/http.js"></script>
+</head>
+<body>
+<h2>Syncman projects</h2>
+{{list:list using="$#projects" as="$item"}}
+<table width='100%' cellpadding="1" cellspacing="1" border="1">
+<tr>
+  <th>Name</th>
+  <th>Status</th>
+  <th>Actions</th>
+</tr>
+{{list:item}}
+<tr>
+  <td>{$item.name}</td>
+  <td>
+    <?php if($item->is_changed) { ?>
+      <span class='changed'>Changed</span>
+    <?php } else { ?>
+      <span class='not_changed'>Not changed</span>
+    <?php } ?>
+  </td>
+  <td>
+    <?php if($item->is_locked) { ?>
+      Sync already in progress
+    <?php } else { ?>
+      <a href="{{route_url params='action:sync,id:{$item.name}'}}"  onclick="res = confirm('Are you sure?');if(res){w = window.open(this.href, 'Sync!', 'toolbar=0,location=0,width=800px,height=800px');w.focus();};return false"><img src="/images/sync.gif" alt="Sync!" title="Synchronize project with remote"/></a>
+    <?php } ?>
+  </td>
+</tr>
+{{/list:item}}
+</table>
+{{/list:list}}
+</body>
+</html>
+

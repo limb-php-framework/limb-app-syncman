@@ -7,12 +7,19 @@ class ProjectsController extends lmbController
 {
   function doDisplay()
   {
-    $this->view->findChild('categories')->registerDataset(Category :: findAllCategories());
+    //$this->view->findChild('categories')->registerDataset(Category :: findAllCategories());
+    $this->view->set('category', Category :: findAllCategories());
+
+    if(isset($_COOKIE['category_detail']))
+      $this->view->set('category_detail', $_COOKIE['category_detail']);
+    else
+      $this->view->set('category_detail', array());
   }
 
   function doSimple()
   {
-    $this->view->findChild('projects')->registerDataset(Project :: findAllProjects());
+    //$this->view->findChild('projects')->registerDataset(Project :: findAllProjects());
+    $this->view->set('projects', Project :: findAllProjects());
   }
 
   function doSync()
@@ -60,6 +67,34 @@ class ProjectsController extends lmbController
   {
     $project = Project :: findProject($this->request->get('id'));
     $project->unlock();
+  }
+
+  function doDetail()
+  {
+    if($category = $this->request->get('category'))
+    {
+      $value = isset($_COOKIE['category_detail'][$category]) ? $_COOKIE['category_detail'][$category] : 0;
+
+      $value = (int) (! $value);
+      $this->_setCookie($category, $value);
+
+      if($this->request->getInteger('js') !== 1)
+        $this->redirect(array('controller' => 'projects', 'action' => 'display'));
+      else
+      {
+        require_once "lib/JsHttpRequest/JsHttpRequest.php";
+        $JsHttpRequest = new JsHttpRequest("utf-8");
+        if($value == 1)
+          $this->view->set('item', Category :: findCategory($category));
+        else
+          exit();
+      }
+    }
+  }
+
+  protected function _setCookie($category, $value)
+  {
+    setcookie("category_detail[{$category}]", $value, $value ? time()+3600*24*30: time(), "/");
   }
 
   function notify($project, $cmd, $log)
