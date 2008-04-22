@@ -2,21 +2,23 @@
 lmb_require('limb/classkit/src/lmbObject.class.php');
 lmb_require('limb/util/src/system/lmbFs.class.php');
 
-@define('SYNCMAN_PROJECTS_SETTINGS_DIR', dirname(__FILE__) . '/../../projects/');
-@define('SYNCMAN_KEY', '/home/syncman/.ssh/id_dsa');
-@define('SYNCMAN_SVN_BIN', 'svn');
-@define('SYNCMAN_RSYNC_BIN', 'rsync');
-@define('SYNCMAN_SSH_BIN', 'ssh');
-
 class Project extends lmbObject
 {
   protected $listener;
   protected $sync_date;
   protected $sync_rev;
+  protected static $default_value;
 
   function __construct($name)
   {
     $this->setName($name);
+
+    if(!isset(self::$default_value))
+      self::$default_value = lmbToolkit :: instance()->getConf('default_value.ini');
+
+    foreach(self::$default_value as $key => $value)
+      if(!isset($this[$key]))
+        $this->set($key, $value);
   }
 
   static function createFromIni($name, $ini)
@@ -296,7 +298,8 @@ class Project extends lmbObject
     $log = '';
     while(!feof($proc))
     {
-     $log = fread($proc, 1000);
+     $t_log = fread($proc, 8192);
+     $log .= $t_log;
      fwrite($fh, $log);
      if($this->listener)
        $this->listener->notify($this, $cmd, $log);
@@ -307,6 +310,8 @@ class Project extends lmbObject
 
     if($res != 0)
       throw new Exception("Command '$cmd' execution failed, return status is '$res'");
+
+    return $log;
   }
 
   protected function _getFileContents($file)

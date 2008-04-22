@@ -3,7 +3,7 @@
 $conf = array(
 'HomePage' =>
   array('path' => '/',
-        'defaults' => array('controller' => 'main_page', 'action' => 'display')),
+    'defaults' => array('controller' => 'projects', 'action' => 'display')),
 
 'ServiceActionId' =>
   array('path' => '/:controller/:action/:id',

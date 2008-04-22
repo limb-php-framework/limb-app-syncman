@@ -1,25 +1,17 @@
 function getDetailForCategory(category) {
-  aOnClick = document.getElementById(category + '_toggle').onclick;
-  aHref = document.getElementById(category + '_toggle').href;
+  aOnClick = jQuery('a#' + category + '_toggle').attr('onclick');
+  aHref = jQuery('a#' + category + '_toggle').attr('href');
 
-  document.getElementById(category + '_toggle').onclick = function onclick(event) {return false;};
-  document.getElementById(category + '_toggle').href = '#';
-  document.getElementById(category).innerHTML = "Loading..."
-  // Create new JsHttpRequest object.
-  var req = new JsHttpRequest();
-  // Code automatically called on load finishing.
-  req.onreadystatechange = function() {
-      if (req.readyState == 4) {
-          // Write debug information too (output becomes responseText).
-          document.getElementById(category).innerHTML = req.responseText;
-          document.getElementById(category + '_toggle').onclick = aOnClick;
-          document.getElementById(category + '_toggle').href = aHref;
-          category_toggle(category);
-          on_load();
-        }
-  }
-  // Prepare request object (automatically choose GET or POST).
-  req.open('GET', aHref + '&js=1', true);
-  // Send data to backend.
-  req.send( );
+  jQuery('a#' + category + '_toggle').attr('onclick', 'return false;');
+  jQuery('a#' + category + '_toggle').attr('href', '#');
+  jQuery('div#' + category).html("Loading...");
+  
+  jQuery.get(aHref + '&js=1',
+    function (data) { 
+      //jQuery('div#' + category).html(data);
+      document.getElementById(category).innerHTML = data;
+      on_load();
+    });
+  jQuery('a#' + category + '_toggle').attr('onclick', aOnClick);
+  jQuery('a#' + category + '_toggle').attr('href', aHref);
 }

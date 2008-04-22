@@ -14,7 +14,6 @@
   <script src="/shared/js/scriptaculous/scriptaculous.js"></script>
   <script src="/js/jquery.js"></script>
   <script src="/js/main.js"></script>
-  <script src="/js/JsHttpRequest.js"></script>
   <script src="/js/getDetailForCategory.js"></script>
 </head>
 <body>
@@ -48,8 +47,7 @@
          </a>
          </legend>
 
-         <?php $state = $open == 0 ? 'none' : 'block'; ?>
-         <div id='{$item.name}_category' style="display: {$state};">
+         <div id='{$item.name}_category'>
          <?php if($open == 1) { ?>
           <?php $this->item = $item; ?>
           {{include file='projects/detail.phtml' /}}
@@ -69,6 +67,5 @@
     </div>
 
   </div>
-
 </body>
 </html>

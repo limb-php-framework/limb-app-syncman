@@ -15,6 +15,7 @@
   <tr class='list'>
     <td class='selector'>{{input type='checkbox' name='ids[]' value='{$project.name}' class='input' /}}</td>
     <td class='project_name'>
+      <a name="project_{$project->name}"></a>
       <?php $project_class = $project->is_changed ? 'changed' : 'not_changed'; ?>
       <span class="{$project_class}" onclick='info_toggle("{$project.name}_info"); return false;'>
           {$project->name}

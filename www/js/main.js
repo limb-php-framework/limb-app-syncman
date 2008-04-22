@@ -16,11 +16,9 @@ function on_load(){
 
 on_load();
 
-function category_toggle (elem_selector){
-  var elem = document.getElementById(elem_selector);
-  var toggle = jQuery(elem).toggle();    
+function category_toggle (elem_selector, display){
   var name_toggle = document.getElementById(elem_selector + '_toggle');
-  if (toggle.css('display') != 'block')
+  if (jQuery(name_toggle).find('img').attr('src') != '/images/icon/open.gif')
       jQuery(name_toggle).find('img').attr('src','/images/icon/open.gif');
   else 
       jQuery(name_toggle).find('img').attr('src','/images/icon/close.gif');

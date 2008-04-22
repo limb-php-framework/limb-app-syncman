@@ -9,6 +9,7 @@ class ProjectsController extends lmbController
   {
     //$this->view->findChild('categories')->registerDataset(Category :: findAllCategories());
     $this->view->set('category', Category :: findAllCategories());
+    
 
     if(isset($_COOKIE['category_detail']))
       $this->view->set('category_detail', $_COOKIE['category_detail']);
@@ -40,18 +41,33 @@ class ProjectsController extends lmbController
 
   function doStartSync()
   {
-    if($ids = $this->request->getArray('ids'))
+    $id_href = '';
+    if($ids = $this->request->getArray('ids')) {}
+    elseif($id = $this->request->get('id'))
+    {
+      $ids = array(0 => $id);
+      $id_href = $id;
+    }
+
+    if(is_array($ids))
     {
       foreach($ids as $id)
       {
         $this->_syncProject($id);
       }
     }
-    elseif($id = $this->request->get('id'))
-      $this->_syncProject($id);
 
     $this->_out("<hr><b>Done!(check logs for errors)</b><br><br>");
-    $this->_out("<script>window.top.opener.location.reload()</script>");
+    $this->_out("<script>
+     window.top.opener.location.reload();
+     window.top.opener.location =
+      window.top.opener.location.protocol + '//' +
+      window.top.opener.location.host + ':' +
+      window.top.opener.location.port + 
+      window.top.opener.location.pathname + 
+      '?' + window.top.opener.location.search +
+      '#' + '{$id_href}';
+    </script>");
   }
 
   protected function _syncProject($id)
@@ -76,25 +92,21 @@ class ProjectsController extends lmbController
       $value = isset($_COOKIE['category_detail'][$category]) ? $_COOKIE['category_detail'][$category] : 0;
 
       $value = (int) (! $value);
-      $this->_setCookie($category, $value);
+      $this->response->setcookie("category_detail[{$category}]", $value, $value ? time()+3600*24*30 : time(), "/");
 
       if($this->request->getInteger('js') !== 1)
         $this->redirect(array('controller' => 'projects', 'action' => 'display'));
       else
       {
-        require_once "lib/JsHttpRequest/JsHttpRequest.php";
-        $JsHttpRequest = new JsHttpRequest("utf-8");
         if($value == 1)
           $this->view->set('item', Category :: findCategory($category));
         else
+        {
+          $this->response->commit();
           exit();
+        }
       }
     }
-  }
-
-  protected function _setCookie($category, $value)
-  {
-    setcookie("category_detail[{$category}]", $value, $value ? time()+3600*24*30: time(), "/");
   }
 
   function notify($project, $cmd, $log)
