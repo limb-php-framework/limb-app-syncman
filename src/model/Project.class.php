@@ -300,9 +300,9 @@ class Project extends lmbObject
     {
      $t_log = fread($proc, 8192);
      $log .= $t_log;
-     fwrite($fh, $log);
+     fwrite($fh, $t_log);
      if($this->listener)
-       $this->listener->notify($this, $cmd, $log);
+       $this->listener->notify($this, $cmd, $t_log);
     }
 
     $res = pclose($proc);
