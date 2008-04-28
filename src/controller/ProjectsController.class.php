@@ -7,9 +7,7 @@ class ProjectsController extends lmbController
 {
   function doDisplay()
   {
-    //$this->view->findChild('categories')->registerDataset(Category :: findAllCategories());
     $this->view->set('category', Category :: findAllCategories());
-    
 
     if(isset($_COOKIE['category_detail']))
       $this->view->set('category_detail', $_COOKIE['category_detail']);
@@ -19,7 +17,6 @@ class ProjectsController extends lmbController
 
   function doSimple()
   {
-    //$this->view->findChild('projects')->registerDataset(Project :: findAllProjects());
     $this->view->set('projects', Project :: findAllProjects());
   }
 
@@ -107,6 +104,42 @@ class ProjectsController extends lmbController
         }
       }
     }
+  }
+
+  function doRollback()
+  {
+    $this->useForm('form');
+    $form_date = array();
+    $project = Project :: findProject($this->request->get('id'));
+    $this->view->set('project', $project);
+
+    if(!$project->getHistory())
+    {
+      $this->flashError("For project '{$project->getName()}' history is off!");
+      $this->redirect(array('controller' => 'projects', 'action' => 'display'));
+      return;
+    }
+
+    if($this->request->hasPost())
+    {
+      $form_date['new_current_ln'] = $this->request->get('new_current_ln');
+      if(!$project->setCurrentLn($form_date['new_current_ln']))
+      {
+        $this->flashError('Change not save!');
+      }
+      else
+        $this->flashMessage('Change save!');
+    }
+
+    $dir_list = array();
+    foreach ($project->getListHistory() as $value)
+      $dir_list[$value] = $value;
+    $this->view->set('dir_list', $dir_list);
+
+    $this->setFormDatasource($form_date);
+
+    foreach ($project->errors as $error)
+      $this->flashError($error);
   }
 
   function notify($project, $cmd, $log)

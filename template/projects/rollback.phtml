@@ -1,0 +1,45 @@
+<? $this->title = 'Rollback project' ?>
+{{insert file="page.phtml"}}
+  {{insert:into slot='content'}}
+
+{{form id='form' name='form' method='post'}}
+<div style="margin: 20px;">
+  <br>
+  <a href="{{route_url params='action:display'}}" class="category"> &#60&#60&#60 Display projects</a>
+  <br><br>
+  <table>
+  <tr>
+    <td class="field">
+    {{label for="name"}}Project name:{{/label}}
+    </td>
+    <td class="value">
+    {$#project.name}
+    </td>
+  </tr>
+  <tr>
+    <td class="field">
+    {{label for="current"}}Current 'DocumentRoot':{{/label}}
+    </td>
+    <td class="value">
+    {$#project.current_ln}
+    </td>
+  </tr>
+  <tr>
+    <td class="field">
+    {{label for="new_current_ln"}}Change current 'DocumentRoot' on:{{/label}}
+    </td>
+    <td class="value">
+    {{select id='new_current_ln' name='new_current_ln' options="$#dir_list"}}{{/select}}
+    </td>
+  </tr>
+  <tr>
+    <td>
+    <input type='submit' value='Apply'/>
+    </td>
+  </tr>
+  </table>
+
+</div>
+{{/form}}
+  {{/insert:into}}
+{{/insert}}

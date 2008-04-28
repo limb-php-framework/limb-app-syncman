@@ -8,26 +8,28 @@ class Project extends lmbObject
   protected $sync_date;
   protected $sync_rev;
   protected static $default_value;
+  protected $connection;
+  public $errors=array();
 
   function __construct($name)
   {
     $this->setName($name);
 
     if(!isset(self::$default_value))
-      self::$default_value = lmbToolkit :: instance()->getConf('default_value.ini');
+      self::$default_value = lmbToolkit :: instance()->getConf('default_value.conf.php');
 
     foreach(self::$default_value as $key => $value)
-      if(!isset($this[$key]))
-        $this->set($key, $value);
+      $this->set($key, $value);
   }
 
-  static function createFromIni($name, $ini)
+  static function createFromConf($name, $conf)
   {
     $project = new Project($name);
 
-    $ini = parse_ini_file($ini);
-    foreach($ini as $key => $value)
+    $conf = new lmbConf($conf);
+    foreach($conf as $key => $value)
       $project->set($key, $value);
+
 
     return $project;
   }
@@ -55,6 +57,9 @@ class Project extends lmbObject
       $this->_execCmd($this->getPresyncCmd());
 
       $this->_resetSyncRev();
+
+      if($this->getHistory())
+         $this->_syncHistory();
 
       $this->_execCmd($this->getSyncCmd());
 
@@ -87,7 +92,7 @@ class Project extends lmbObject
       if($item{0} == '.')
         continue;
 
-      $project = self :: createFromIni($item, SYNCMAN_PROJECTS_SETTINGS_DIR . '/' . $item . '/settings.ini');
+      $project = self :: createFromConf($item, SYNCMAN_PROJECTS_SETTINGS_DIR . '/' . $item . '/settings.conf.php');
       $projects[] = $project;
     }
     return $projects;
@@ -143,6 +148,11 @@ class Project extends lmbObject
   function getPostsyncCmd()
   {
     return $this->_getFilled('postsync_cmd');
+  }
+
+  function getRemoteDir()
+  {
+    return $this->_getRaw('remote_dir') . ($this->getHistory() ? '/current' : '');
   }
 
   function getRemoteUserWithHost()
@@ -287,6 +297,124 @@ class Project extends lmbObject
     return SYNCMAN_SVN_BIN . ' diff --summarize ' . '-r' . $revision1 . ':' . $revision2 . ' ' . $this->getRepository();
   }
 
+  protected function _ssh2Connection()
+  {
+    if(function_exists('ssh2_connect'))
+    {
+      $this->connection = ssh2_connect($this->getHost(), $this->getPort());
+      if(!$this->connection)
+        throw new Exception("No connection to the ssh server!");
+      if(!ssh2_auth_pubkey_file($this->connection, $this->getUser(),
+                            $this->getKey().'.pub',
+                            $this->getKey(), $this->getPassword()))
+        throw new Exception("Public Key Authentication Failed!");
+    }
+    else
+      $this->connection = true;
+  }
+
+  protected function _syncHistory()
+  {
+    if(!$this->connection)
+      $this->_ssh2Connection();
+
+
+    $new_dir = trim($this->_execCmdSsh($this->getSshGetDate()));
+
+    $new_dir = $this->_getRaw('remote_dir').'/'.$new_dir;
+    $cmd = str_replace('$dir', $new_dir, $this->getSshMkdir());
+    $this->_execCmdSsh($cmd);
+
+    $cmd = str_replace(array('$dir_of', '$dir_in'),
+                       array($this->getRemoteDir(), $new_dir),
+                       $this->getSshCp());
+    try
+    {
+      $this->_execCmdSsh($cmd);
+    }
+    catch (Exception $e)
+    {
+      $this->_writeOutputInLog("'cp' execution failed => initialization file structure", "no cmd");
+    }
+
+    $cmd = str_replace(array('$ln_path', '$new_dir'),
+                       array($this->getRemoteDir(), $new_dir),
+                       $this->getSshLnEdit());
+    $this->_execCmdSsh($cmd);
+  }
+
+  protected function _writeOutputInLog($proc, $cmd)
+  {
+    $fh = fopen($this->getLogFile(), 'a');
+    $log = '';
+    if(is_string($proc))
+    {
+      $log = $proc;
+      fwrite($fh, $log);
+        if($this->listener)
+          $this->listener->notify($this, $cmd, $log);
+    }
+    else
+    {
+      while($t_log = fgets($proc))
+      {
+        $log .= $t_log;
+        fwrite($fh, $t_log);
+        if($this->listener)
+          $this->listener->notify($this, $cmd, $t_log);
+      }
+    }
+    fclose($fh);
+    return $log;
+  }
+
+  protected function _execCmdSshNoException($cmd, &$out='')
+  {
+    try
+    {
+      if(!$this->connection)
+        $this->_ssh2Connection();
+      $out = $this->_execCmdSsh($cmd);
+      return true;
+    }
+    catch(Exception $e)
+    {
+      $this->errors[] = $e->getMessage();
+      return false;
+    }
+  }
+
+  protected function _execCmdSsh($cmd)
+  {
+    $log = '';
+    if(!$cmd)
+      return;
+    if(function_exists('ssh2_exec'))
+    {
+      if(!$this->connection)
+        throw new Exception("No connection to the ssh server!");
+      $proc = ssh2_exec($this->connection, $cmd);
+      if($proc == false)
+        throw new Exception("Ssh command '$cmd' execution failed!");
+      else
+      {
+        $err_stream = ssh2_fetch_stream($proc, 1);
+
+        stream_set_blocking($err_stream, true);
+        stream_set_blocking($proc, true);
+
+        $err_log = $this->_writeOutputInLog($err_stream, "ssh-err@:~$ ".$cmd);
+        $log = $this->_writeOutputInLog($proc, "ssh-out@:~$ ".$cmd);
+
+        if($err_log !== '')
+          throw new Exception("Ssh command '$cmd' execution failed! Out: '$err_log'");
+      }
+    }
+    else
+      $this->_execCmd(SYNCMAN_SSH_BIN . ' -i ' . $this->getKey() . " " . $this->getRemoteUserWithHost() . " " . $cmd);
+    return $log;
+  }
+
   protected function _execCmd($cmd)
   {
     if(!$cmd)
@@ -294,19 +422,9 @@ class Project extends lmbObject
 
     $proc = popen("$cmd 2>&1", 'r');
 
-    $fh = fopen($this->getLogFile(), 'a');
-    $log = '';
-    while(!feof($proc))
-    {
-     $t_log = fread($proc, 8192);
-     $log .= $t_log;
-     fwrite($fh, $t_log);
-     if($this->listener)
-       $this->listener->notify($this, $cmd, $t_log);
-    }
+    $log = $this->_writeOutputInLog($proc, $cmd);
 
     $res = pclose($proc);
-    fclose($fh);
 
     if($res != 0)
       throw new Exception("Command '$cmd' execution failed, return status is '$res'");
@@ -340,7 +458,7 @@ class Project extends lmbObject
                              $this->getKey(),
                              $this->getSettingsDir(),
                              ),
-                             $str);
+                       $str);
   }
 
   protected function _removeOldLog()
@@ -359,6 +477,36 @@ class Project extends lmbObject
   {
     $value = parent :: _getRaw($name);
     return $this->_fillTemplate($value);
+  }
+
+  function getListHistory()
+  {
+    $cmd = str_replace('$dir', $this->_getRaw('remote_dir'), $this->getSshLs());
+    if($this->_execCmdSshNoException($cmd, $ls))
+    {
+      $ls = explode("\n", $ls);
+      foreach($ls as $key => $value)
+        if(!preg_match($this->getSshPregDir(), $value))
+          unset($ls[$key]);
+      return $ls;
+    }
+    return null;
+  }
+
+  function getCurrentLn()
+  {
+    $cmd = str_replace('$link', $this->getRemoteDir(), $this->getSshReadlink());
+    if($this->_execCmdSshNoException($cmd, $current_ln))
+      return trim($current_ln);
+    return null;
+  }
+
+  function setCurrentLn($new_dir)
+  {
+    $cmd = str_replace(array('$ln_path', '$new_dir'),
+                       array($this->getRemoteDir(), $new_dir),
+                       $this->getSshLnEdit());
+    return $this->_execCmdSshNoException($cmd);
   }
 }
 

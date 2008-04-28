@@ -14,7 +14,7 @@ class ProjectTest extends UnitTestCase
     remote_dir=/var/www/mydir
     presync_cmd=php %local_dir%/cli/pre_sync.php
     postsync_cmd=ssh -i %key% %user%@%host% 'php %remote_dir%/cli/post_sync.php'
-    sync_cmd=rsync -Cavz -e 'ssh -i %key%' %user%@%host% 
+    sync_cmd=rsync -Cavz -e 'ssh -i %key%' %user%@%host%
     ");
 
     $project = Project :: createFromIni('foo', $ini);

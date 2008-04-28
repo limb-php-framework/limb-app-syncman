@@ -1,0 +1,40 @@
+<html>
+<head>
+  <title>{$#title} :: Syncman</title>
+  <meta http-equiv='Content-Type' content='text/html; charset=utf-8'/>
+  <link rel="stylesheet" href="/styles/main.css" type="text/css" />
+  {{slot id="head" /}}
+</head>
+<body>
+
+  <div id="wrapper">
+
+    <div id="content">
+
+      <div id="head">
+        <img src="/images/logo.syncman.gif"  width='250' height='63' alt='SYNCMAN' id='logo'/>
+        <span class='version'><?php echo SYNCMAN_VERSION; ?></span>
+      </div>
+
+  <?php $flash_messages = $this->toolkit->getFlashBox()->getUnifiedList(); ?>
+
+  {{list using='$flash_messages'}}
+  {{list:item}}
+  <?php if($item['is_error']){ ?><div class="error"><b>{$item.message}</b></div><? } ?>
+  <?php if($item['is_message']){ ?><div class="message"><b>{$item.message}</b></div><? } ?>
+  {{/list:item}}
+  {{/list}}
+
+
+      {{slot id="content" /}}
+
+    </div>
+
+    <div id="footer">
+      <a href="http://www.bit-creative.com/" target="_blank" title="BIT project" id='bit'><img src="/images/bit.gif"  onMouseOut="this.src='/images/bit.gif';" onMouseOver="this.src='/images/bit_hover.gif';" alt="BIT project" width="80" height="21"/></a>
+      <a href="http://www.limb-project.com" id='limb'><img src="/images/logo.limb.gif"  width='114' height='41' alt='LIMB'/></a>
+    </div>
+
+  </div>
+</body>
+</html>

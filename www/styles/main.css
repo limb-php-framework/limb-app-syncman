@@ -47,7 +47,7 @@
 
 /*layout*/
   #wrapper {min-height:100%;position:relative;}
-    *html #wrapper {height:100%;}
+    #html #wrapper {height:100%;}
   #content {padding:0 0 90px 0;}
   
   #head {background: #fff;margin:0 0 5px 0;}
@@ -67,5 +67,8 @@
     #limb {float:right;margin:15px 0 0 30px;}
     #bit {margin: 25px 30px 0px;float:right;}
   
-  
+  div.error {font:bold 1.4em "Trebuchet MS"; background: #ffc5c5; margin: 10px;}
+  div.message {font:bold 1.4em "Trebuchet MS"; background: #e5ffd5; margin: 10px;}
+  .field {font:bold 1.4em "Trebuchet MS"; color:#2a3f62; padding: 5px 0px 0px 0px;}
+  .value {font:1.4em "Trebuchet MS"; color:#000000; padding: 5px 0px 0px 20px;} 
   
