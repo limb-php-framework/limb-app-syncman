@@ -1,11 +1,12 @@
 <?php
-lmb_require('limb/web_app/src/lmbWebApplication.class.php');
 
-class SyncmanApplication extends lmbWebApplication
+lmb_require('limb/filter_chain/src/lmbFilterChain.class.php');
+lmb_require('limb/web_app/src/controller/lmbController.class.php');
+lmb_require('limb/core/src/lmbHandle.class.php');
 
+class SyncmanApplication extends lmbFilterChain
 {
-
-  function __construct()
+  function process()
   {
     $this->registerFilter(new lmbHandle('limb/web_app/src/filter/lmbUncaughtExceptionHandlingFilter'));
     $this->registerFilter(new lmbHandle('limb/web_app/src/filter/lmbSessionStartupFilter'));
@@ -14,8 +15,7 @@ class SyncmanApplication extends lmbWebApplication
     $this->registerFilter(new lmbHandle('limb/web_app/src/filter/lmbResponseTransactionFilter'));
     $this->registerFilter(new lmbHandle('limb/web_app/src/filter/lmbActionPerformingFilter'));
     $this->registerFilter(new lmbHandle('limb/web_app/src/filter/lmbViewRenderingFilter'));
+
+    parent :: process();
   }
-
 }
-
-?>
