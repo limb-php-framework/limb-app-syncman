@@ -53,9 +53,9 @@
     }
   };
 
-  new Ajax.Request('/projects/start_sync/{$#request.id}?sync_date={$#sync_date}', { method: 'get' } );
+  new Ajax.Request('projects/start_sync/{$#request.id}?sync_date={$#sync_date}', { method: 'get' } );
   window.progress_bar = new ProgressBar('progress_bar');
-  window.console = new Console('console', '/projects/progress/{$#request.id}?sync_date={$#sync_date}', params);
+  window.console = new Console('console', 'projects/progress/{$#request.id}?sync_date={$#sync_date}', params);
   window.current_state = 0;
 </script>
 

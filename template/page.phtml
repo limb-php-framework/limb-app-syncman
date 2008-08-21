@@ -2,7 +2,8 @@
 <head>
   <title>{$#title} :: Syncman</title>
   <meta http-equiv='Content-Type' content='text/html; charset=utf-8'/>
-  <link rel="stylesheet" href="/styles/main.css" type="text/css" />
+  <link rel="stylesheet" href="styles/main.css" type="text/css" />
+  <base href="<?php echo LIMB_HTTP_BASE_PATH; ?>"/>
   {{slot id="head" /}}
 </head>
 <body>
@@ -12,7 +13,7 @@
     <div id="content">
 
       <div id="head">
-        <img src="/images/logo.syncman.gif"  width='250' height='63' alt='SYNCMAN' id='logo'/>
+        <img src="images/logo.syncman.gif"  width='250' height='63' alt='SYNCMAN' id='logo'/>
         <span class='version'><?php echo SYNCMAN_VERSION; ?></span>
       </div>
 
@@ -31,8 +32,8 @@
     </div>
 
     <div id="footer">
-      <a href="http://www.bit-creative.com/" target="_blank" title="BIT project" id='bit'><img src="/images/bit.gif"  onMouseOut="this.src='/images/bit.gif';" onMouseOver="this.src='/images/bit_hover.gif';" alt="BIT project" width="80" height="21"/></a>
-      <a href="http://www.limb-project.com" id='limb'><img src="/images/logo.limb.gif"  width='114' height='41' alt='LIMB'/></a>
+      <a href="http://www.bit-creative.com/" target="_blank" title="BIT project" id='bit'><img src="images/bit.gif"  onMouseOut="this.src='images/bit.gif';" onMouseOver="this.src='images/bit_hover.gif';" alt="BIT project" width="80" height="21"/></a>
+      <a href="http://www.limb-project.com" id='limb'><img src="images/logo.limb.gif"  width='114' height='41' alt='LIMB'/></a>
     </div>
 
   </div>

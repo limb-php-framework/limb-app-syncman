@@ -1,18 +1,10 @@
 <? $this->title = 'Projects' ?>
 {{insert file="page.phtml"}}
   {{insert:into slot='head'}}
-<script src="/shared/js/prototype.js"></script>
-<script src="/shared/js/Limb.js"></script>
-<script src="/shared/js/Limb/browser.js"></script>
-<script src="/shared/js/Limb/events.js"></script>
-<script src="/shared/js/Limb/http.js"></script>
-<script src="/shared/js/Limb/window.js"></script>
-<script src="/shared/js/Limb/forms.js"></script>
-<script src="/shared/js/Limb/form_elements.js"></script>
-<script src="/shared/js/scriptaculous/scriptaculous.js"></script>
-<script src="/js/jquery.js"></script>
-<script src="/js/main.js"></script>
-<script src="/js/getDetailForCategory.js"></script>
+<script src="js/prototype.js"></script>
+<script src="js/jquery.js"></script>
+<script src="js/main.js"></script>
+<script src="js/getDetailForCategory.js"></script>
   {{/insert:into}}
   {{insert:into slot='content'}}
       {{list:list using="$#category" as="$item"}}
@@ -31,7 +23,7 @@
             onclick="getDetailForCategory('{$item.name}_category'); return false;"
             class="category">
          <strong>Category '{$item.name}'</strong>
-         <img src="/images/icon/{$state}.gif"  width='11' height='11' alt='{$state}'/>
+         <img src="images/icon/{$state}.gif"  width='11' height='11' alt='{$state}'/>
          </a>
          </legend>
 

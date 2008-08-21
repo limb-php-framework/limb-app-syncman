@@ -18,10 +18,10 @@ on_load();
 
 function category_toggle (elem_selector, display){
   var name_toggle = document.getElementById(elem_selector + '_toggle');
-  if (jQuery(name_toggle).find('img').attr('src') != '/images/icon/open.gif')
-      jQuery(name_toggle).find('img').attr('src','/images/icon/open.gif');
+  if (jQuery(name_toggle).find('img').attr('src') != 'images/icon/open.gif')
+      jQuery(name_toggle).find('img').attr('src','images/icon/open.gif');
   else 
-      jQuery(name_toggle).find('img').attr('src','/images/icon/close.gif');
+      jQuery(name_toggle).find('img').attr('src','images/icon/close.gif');
 }
 
 function info_toggle (elem_selector){
@@ -29,9 +29,9 @@ function info_toggle (elem_selector){
   var toggle = jQuery(elem).toggle();    
   var name_toggle = document.getElementById(elem_selector + '_toggle');
   if (toggle.css('display') != 'block')
-     { jQuery(name_toggle).find('img').attr('src','/images/icon/plus.gif');}
+     { jQuery(name_toggle).find('img').attr('src','images/icon/plus.gif');}
   else 
-      {jQuery(name_toggle).find('img').attr('src','/images/icon/minus.gif');}
+      {jQuery(name_toggle).find('img').attr('src','images/icon/minus.gif');}
       
 }
 
