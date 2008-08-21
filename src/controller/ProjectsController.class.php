@@ -144,11 +144,11 @@ class ProjectsController extends lmbController
 
   function notify($project, $cmd, $log)
   {
-    static $cmds = array();
-    if(!isset($cmds[$cmd]))
+    static $last_cmd = '';
+    if(!$last_cmd !== $cmd)
     {
       $this->_out("<hr><b>$cmd</b><br>");
-      $cmds[$cmd] = 1;
+      $last_cmd = $cmd;
     }
 
     $this->_out('<small>' . nl2br($log) . '</small>');

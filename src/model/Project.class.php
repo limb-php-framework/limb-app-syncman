@@ -345,6 +345,9 @@ class Project extends lmbObject
 
   protected function _writeOutputInLog($proc, $cmd)
   {
+    if($this->listener)
+      $this->listener->notify($this, $cmd, '');
+
     $fh = fopen($this->getLogFile(), 'a');
     $log = '';
     if(is_string($proc))
