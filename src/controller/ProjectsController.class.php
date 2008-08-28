@@ -5,6 +5,8 @@ lmb_require('limb/web_app/src/controller/lmbController.class.php');
 
 class ProjectsController extends lmbController
 {
+  protected $last_cmd;
+
   function doDisplay()
   {
     $this->view->set('category', Category :: findAllCategories());
@@ -144,11 +146,10 @@ class ProjectsController extends lmbController
 
   function notify($project, $cmd, $log)
   {
-    static $last_cmd = '';
-    if(!$last_cmd !== $cmd)
+    if($this->last_cmd !== $cmd)
     {
       $this->_out("<hr><b>$cmd</b><br>");
-      $last_cmd = $cmd;
+      $this->last_cmd = $cmd;
     }
 
     $this->_out('<small>' . nl2br($log) . '</small>');
