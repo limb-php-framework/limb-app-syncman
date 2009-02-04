@@ -4,6 +4,7 @@
 
 2) Make /var/www/syncman/var directory writable for web server:
 
+$ mkdir /var/www/syncman/var #create it if it's missing
 $ chmod 777 /var/www/syncman/var
 
 3) Create syncman VirtualHost in Apache config file(httpd.conf), something like this:

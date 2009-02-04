@@ -4,12 +4,13 @@ lmb_require('limb/util/src/system/lmbFs.class.php');
 
 class Project extends lmbObject
 {
+  protected static $default_value;
+
   protected $listener;
   protected $sync_date;
   protected $sync_rev;
-  protected static $default_value;
   protected $connection;
-  public $errors=array();
+  public $errors = array();
 
   function __construct($name)
   {
@@ -52,14 +53,16 @@ class Project extends lmbObject
       else
         $this->_execCmd($this->getUpdateWcCmd());
 
-      $this->_syncLocalDirWithWc();
-
-      $this->_execCmd($this->getPresyncCmd());
+      if($this->needPresync())
+      {
+        $this->_syncLocalDirWithWc();
+        $this->_execCmd($this->getPresyncCmd());
+      }
 
       $this->_resetSyncRev();
 
       if($this->getHistory())
-         $this->_syncHistory();
+        $this->_syncHistory();
 
       $this->_execCmd($this->getSyncCmd());
 
@@ -89,7 +92,7 @@ class Project extends lmbObject
     $projects = array();
     foreach(scandir(SYNCMAN_PROJECTS_SETTINGS_DIR) as $item)
     {
-      if($item{0} == '.')
+      if($item{0} == '.' || !is_dir(SYNCMAN_PROJECTS_SETTINGS_DIR . '/' . $item))
         continue;
 
       $project = self :: createFromConf($item, SYNCMAN_PROJECTS_SETTINGS_DIR . '/' . $item . '/settings.conf.php');
@@ -140,6 +143,13 @@ class Project extends lmbObject
       $this->getLocalDir(). '/ ' . $this->getRemoteUserWithHost() . ':' . $this->getRemoteDir();
   }
 
+  function needPresync()
+  {
+    if(!$this->has('presync') || $this->_getRaw('presync') == true)
+      return true;
+    return false;
+  }
+
   function getPresyncCmd()
   {
     return $this->_getFilled('presync_cmd');
@@ -167,24 +177,74 @@ class Project extends lmbObject
 
   function getCheckoutWcCmd()
   {
-    return SYNCMAN_SVN_BIN . ' co --non-interactive ' . $this->getRepository() . ' ' . $this->getWc();
+    if($cmd = $this->_getFilled('checkout_wc_cmd'))
+      return $cmd;
+
+    $paths = $this->_getRaw('repository_paths');
+    if(is_array($paths))
+    {
+      $cmd = '(mkdir -p ' . $this->getWc() . ' && ';
+      foreach($paths as $path)
+      {
+        if($path{0} == '>')
+          $cmd .= SYNCMAN_SVN_BIN . ' cat --non-interactive ' . $this->getRepository() . '/' . substr($path, 1) . ' > ' . $this->getWc() . '/' . substr($path, 1) . ' && '; 
+        else
+          $cmd .= SYNCMAN_SVN_BIN . ' co --non-interactive ' . $this->getRepository() . '/' . $path . ' ' . $this->getWc() . '/' . $path . ' && '; 
+      }
+      $cmd = rtrim($cmd, ' && ');
+      $cmd .= ')';
+      return $cmd;
+    }
+    else
+      return $SYNCMAN_SVN_BIN . ' co --non-interactive ' . $this->getRepository() . ' ' . $this->getWc();
   }
 
   function getUpdateWcCmd()
   {
-    return SYNCMAN_SVN_BIN . ' up --non-interactive ' . $this->getWc();
+    if($cmd = $this->_getFilled('update_wc_cmd'))
+      return $cmd;
+
+    $paths = $this->_getRaw('repository_paths');
+    if(is_array($paths))
+    {
+      $cmd = '(';
+      foreach($paths as $path)
+      {
+        if($path{0} == '>')
+          $cmd .= SYNCMAN_SVN_BIN . ' cat --non-interactive ' . $this->getRepository() . '/' . substr($path, 1) . ' > ' . $this->getWc() . '/' . substr($path, 1) . ' && '; 
+        else
+          $cmd .= SYNCMAN_SVN_BIN . ' up --non-interactive ' . $this->getWc() . '/' . $path . ' && '; 
+      }
+      $cmd = rtrim($cmd, ' && ');
+      $cmd .= ')';
+      return $cmd;
+    }
+    else
+      return $SYNCMAN_SVN_BIN . ' up --non-interactive ' . $this->getWc();
   }
 
   function getWcRev()
   {
-    return $this->_getRev($this->getWc());
+    $paths = $this->_getRaw('repository_paths');
+    //in case we have a limited set of repo paths use the first one
+    if(is_array($paths))
+    {
+      //find first non file arg
+      foreach($paths as $path)
+      {
+        if($path{0} != '>')
+          return $this->_getRev($this->getWc() . '/' . $path);
+      }
+      throw new Exception("Could not determine revision of a working directory");
+    }
+    else
+      return $this->_getRev($this->getWc());
   }
 
   function getRepositoryRev()
   {
     return $this->_getRev($this->getRepository());
   }
-
 
   protected function _getRev($path)
   {
