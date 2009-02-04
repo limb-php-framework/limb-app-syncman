@@ -27,27 +27,9 @@
     <td width='50%'>
       <a href='#' id='{$project.name}_info_toggle' onclick='info_toggle("{$project.name}_info"); return false;'><img src="images/icon/plus.gif"  width='10' height='10' alt='plus'/></a>
       <dl id='{$project.name}_info' class='info'>
-        <dt>Repos:</dt><dd>{$project.repository}</dd>
-        <dt>Remote host:</dt><dd>{$project.user}@{$project.host}</dd>
-        <dt>Remote dir:</dt><dd>{$project.remote_dir}</dd>
-        <dt>Presync cmd:</dt><dd>{$project.presync_cmd}</dd>
-        <dt>Sync cmd:</dt><dd>{$project.sync_cmd}</dd>
-        <dt>Postsync cmd:</dt><dd>{$project.postsync_cmd}</dd>
-        <?php if (isset($project->url)) { ?>
-          <dt>Project URI:</dt><dd><a href="{$project.url}" class='project' target="_blank">{$project.url}</a></dd>
-        <?php } ?>
-        <?php if ($project->history == true) { ?>
-          <dt>History:</dt><dd>
-            YES
-            <br>ssh_get_date: {$project.ssh_get_date}
-            <br>ssh_mkdir: {$project.ssh_mkdir}
-            <br>ssh_ln_edit: {$project.ssh_ln_edit}
-            <br>ssh_cp: {$project.ssh_cp}
-            <br>ssh_ls: {$project.ssh_ls}
-            <br>ssh_preg_dir: {$project.ssh_preg_dir}
-            <br>ssh_readlink: {$project.ssh_readlink}
-          </dd>
-        <?php } ?>
+        <pre>
+        {$project.exported_config}
+        </pre>
       </dl>
     </td>
     <td class='actions'>

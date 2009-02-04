@@ -10,11 +10,17 @@ class Project extends lmbObject
   protected $sync_date;
   protected $sync_rev;
   protected $connection;
+  protected $orig_conf;
+
   public $errors = array();
 
-  function __construct($name)
+  function __construct($name, lmbConf $conf)
   {
     $this->setName($name);
+
+    foreach($conf as $key => $value)
+      $this->set($key, $value);
+    $this->orig_conf = $conf;
 
     if(!isset(self::$default_value))
       self::$default_value = lmbToolkit :: instance()->getConf('default_value.conf.php');
@@ -25,14 +31,7 @@ class Project extends lmbObject
 
   static function createFromConf($name, $conf)
   {
-    $project = new Project($name);
-
-    $conf = new lmbConf($conf);
-    foreach($conf as $key => $value)
-      $project->set($key, $value);
-
-
-    return $project;
+    return new Project($name, new lmbConf($conf));
   }
 
   function sync($listener = null)
@@ -119,6 +118,11 @@ class Project extends lmbObject
   {
     if($this->getIsLocked())
       unlink($this->getLockFile());
+  }
+
+  function getExportedConfig()
+  {
+    return var_export(array($this->orig_conf->export()), true);
   }
 
   function getLocalDir()
