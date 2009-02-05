@@ -4,7 +4,7 @@ lmb_require('limb/util/src/system/lmbFs.class.php');
 
 class Project extends lmbObject
 {
-  protected static $default_value;
+  protected static $default_conf;
 
   protected $listener;
   protected $sync_date;
@@ -18,15 +18,15 @@ class Project extends lmbObject
   {
     $this->setName($name);
 
+    if(!isset(self::$default_conf))
+      self::$default_conf = lmbToolkit :: instance()->getConf('default_value.conf.php');
+
+    foreach(self::$default_conf as $key => $value)
+      $this->set($key, $value);
+
     foreach($conf as $key => $value)
       $this->set($key, $value);
     $this->orig_conf = $conf;
-
-    if(!isset(self::$default_value))
-      self::$default_value = lmbToolkit :: instance()->getConf('default_value.conf.php');
-
-    foreach(self::$default_value as $key => $value)
-      $this->set($key, $value);
   }
 
   static function createFromConf($name, $conf)

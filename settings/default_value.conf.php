@@ -1,21 +1,21 @@
 <?php
 $conf = array(
   'host' => 'localhost',
-  'category' => 'no_category',
+  'category' => '---',
   'history' => false,
-  // удаленные каталоги будут называться по результату выполнения этой команды
+  // removed directories will be named using the command below
   'ssh_get_date' => "date +%F_%R",
   'ssh_mkdir' => "mkdir -p \$dir",
-  // создание символьной ссылки; exp: rm /home/user/ssilka; ln -s /var/www/exp /home/user/ssilka;
+  // expression for symbolic link creation
   'ssh_ln_edit' => "rm -f \$ln_path; ln -s \$new_dir \$ln_path;",
-  // копирование каталогов;
-  // Важно! команда копирования должна сохранять дату создания файла, иначе rsync будет перезаписывать весь каталог при обновлении 
+  // directory copy command
+  // NOTE: the copy command should preserve date of file creation, otherwise rsync will overwrite the whole directory on the next sync
   'ssh_cp' => "cp -pRT \$dir_of/ \$dir_in/",
-  // список каталогов. Полученный каталог из этого списка впоследствии применяется для установки ссылки командой 'ssh_ln_edit'
+  // directories list command. A directory from this list is used for symbolic link creation with 'ssh_ln_edit' command
   'ssh_ls' => "ls -F --classify -1 \$dir",
-  // выражение для отбора каталогов из списка файлов
+  // expression which filters directories
   'ssh_preg_dir' => "/(.)+\//",
-  // прочитать значение симольной ссылки
+  // read the value of a symlink
   'ssh_readlink' => "readlink -v \$link",
-  );
+);
 
