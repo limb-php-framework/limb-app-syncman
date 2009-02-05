@@ -122,7 +122,7 @@ class Project extends lmbObject
 
   function getExportedConfig()
   {
-    return var_export(array($this->orig_conf->export()), true);
+    return var_export($this->orig_conf->export(), true);
   }
 
   function getLocalDir()
@@ -184,23 +184,7 @@ class Project extends lmbObject
     if($cmd = $this->_getFilled('checkout_wc_cmd'))
       return $cmd;
 
-    $paths = $this->_getRaw('repository_paths');
-    if(is_array($paths))
-    {
-      $cmd = '(mkdir -p ' . $this->getWc() . ' && ';
-      foreach($paths as $path)
-      {
-        if($path{0} == '>')
-          $cmd .= SYNCMAN_SVN_BIN . ' cat --non-interactive ' . $this->getRepository() . '/' . substr($path, 1) . ' > ' . $this->getWc() . '/' . substr($path, 1) . ' && '; 
-        else
-          $cmd .= SYNCMAN_SVN_BIN . ' co --non-interactive ' . $this->getRepository() . '/' . $path . ' ' . $this->getWc() . '/' . $path . ' && '; 
-      }
-      $cmd = rtrim($cmd, ' && ');
-      $cmd .= ')';
-      return $cmd;
-    }
-    else
-      return $SYNCMAN_SVN_BIN . ' co --non-interactive ' . $this->getRepository() . ' ' . $this->getWc();
+    return SYNCMAN_SVN_BIN . ' co --non-interactive ' . $this->getRepository() . ' ' . $this->getWc();
   }
 
   function getUpdateWcCmd()
@@ -208,41 +192,12 @@ class Project extends lmbObject
     if($cmd = $this->_getFilled('update_wc_cmd'))
       return $cmd;
 
-    $paths = $this->_getRaw('repository_paths');
-    if(is_array($paths))
-    {
-      $cmd = '(';
-      foreach($paths as $path)
-      {
-        if($path{0} == '>')
-          $cmd .= SYNCMAN_SVN_BIN . ' cat --non-interactive ' . $this->getRepository() . '/' . substr($path, 1) . ' > ' . $this->getWc() . '/' . substr($path, 1) . ' && '; 
-        else
-          $cmd .= SYNCMAN_SVN_BIN . ' up --non-interactive ' . $this->getWc() . '/' . $path . ' && '; 
-      }
-      $cmd = rtrim($cmd, ' && ');
-      $cmd .= ')';
-      return $cmd;
-    }
-    else
-      return $SYNCMAN_SVN_BIN . ' up --non-interactive ' . $this->getWc();
+    return SYNCMAN_SVN_BIN . ' up --non-interactive ' . $this->getWc();
   }
 
   function getWcRev()
   {
-    $paths = $this->_getRaw('repository_paths');
-    //in case we have a limited set of repo paths use the first one
-    if(is_array($paths))
-    {
-      //find first non file arg
-      foreach($paths as $path)
-      {
-        if($path{0} != '>')
-          return $this->_getRev($this->getWc() . '/' . $path);
-      }
-      throw new Exception("Could not determine revision of a working directory");
-    }
-    else
-      return $this->_getRev($this->getWc());
+    return $this->_getRev($this->getWc());
   }
 
   function getRepositoryRev()
@@ -265,7 +220,11 @@ class Project extends lmbObject
   function getWc()
   {
     lmbFs :: mkdir(LIMB_VAR_DIR . '/wc/');
-    return LIMB_VAR_DIR . '/wc/' . $this->getName();
+    $shared_wc = $this->getSharedWc();
+    if($shared_wc)
+      return LIMB_VAR_DIR . '/wc/' . $shared_wc;
+    else
+      return LIMB_VAR_DIR . '/wc/' . $this->getName();
   }
 
   function getIsChanged()
