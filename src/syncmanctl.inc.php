@@ -43,4 +43,14 @@ function task_rexec($args = array())
   $project->rexec(implode(" ", $args), new CliResponse());
 }
 
+function task_rtask($args = array())
+{
+  if(!$args)
+    throw new Exception("Args missing");
+
+  $name = array_shift($args);
+  $project = Project :: findProject($name);
+  $project->rtask(implode(" ", $args), new CliResponse());
+}
+
 

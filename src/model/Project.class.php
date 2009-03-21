@@ -80,13 +80,14 @@ class Project extends lmbObject
 
   function rexec($cmd, $listener = null)
   {
+
     $this->lock();
 
     $this->listener = $listener;
 
     try
     {
-      $this->_execCmd(SYNCMAN_SSH_BIN . ' -i ' . $this->getKey() . " " . $this->getRemoteUserWithHost() . " " . $cmd);
+      $this->_execCmd(SYNCMAN_SSH_BIN . ' -i ' . $this->getKey() . " " . $this->getRemoteUserWithHost() . " '" . $cmd . "'");
     }
     catch(Exception $e)
     {
@@ -94,6 +95,16 @@ class Project extends lmbObject
     }
 
     $this->unlock();
+  }
+
+  //assumes we have taskman based project
+  function rtask($cmd, $listener = null)
+  {
+    $taskman_script = $this->_getRaw('taskman_script');
+    if(!$taskman_script)
+      throw new Exception("'taskman_script' property is missing");
+
+    $this->rexec("$taskman_script $cmd");
   }
 
   function diff($revision1, $revision2 = 'HEAD', $listener = null)
