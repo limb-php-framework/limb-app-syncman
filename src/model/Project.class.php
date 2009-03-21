@@ -78,6 +78,24 @@ class Project extends lmbObject
     $this->unlock();
   }
 
+  function rexec($cmd, $listener = null)
+  {
+    $this->lock();
+
+    $this->listener = $listener;
+
+    try
+    {
+      $this->_execCmd(SYNCMAN_SSH_BIN . ' -i ' . $this->getKey() . " " . $this->getRemoteUserWithHost() . " " . $cmd);
+    }
+    catch(Exception $e)
+    {
+      $this->listener->error($this, $e->getMessage());
+    }
+
+    $this->unlock();
+  }
+
   function diff($revision1, $revision2 = 'HEAD', $listener = null)
   {
     $this->listener = $listener;
