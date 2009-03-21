@@ -168,4 +168,3 @@ class ProjectsController extends lmbController
   }
 }
 
-?>

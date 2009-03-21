@@ -59,4 +59,3 @@ class Category extends lmbObject
   }
 }
 
-?>

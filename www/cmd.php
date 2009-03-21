@@ -1,11 +1,7 @@
-#!/usr/bin/env php
 <?php
+header("Cache-Control: no-cache, must-revalidate");
+header("Expires: Mon, 26 Jul 1970 05:00:00 GMT"); 
 
-if(!isset($argv[1]))
-{
-  echo("Usage: sync.php <project>,[<project>,<project>...]\n");
-  exit(1);
-}
 require_once(dirname(__FILE__) . '/../setup.php');
 require_once('src/model/Project.class.php');
 
@@ -27,7 +23,11 @@ class CliResponse
     echo($log);
   }
 }
-$names = explode(",", $argv[1]);
+
+if(!isset($_GET['cmd']))
+  exit();
+
+$names = explode(",", $_GET['cmd']);
 foreach($names as $name)
 {
   $project = Project :: findProject($name);

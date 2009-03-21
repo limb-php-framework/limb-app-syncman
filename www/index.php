@@ -9,5 +9,3 @@ lmb_require('limb/web_app/src/controller/*.class.php');
 
 $application = new SyncmanApplication();
 $application->process();
-
-?>

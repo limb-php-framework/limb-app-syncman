@@ -6,7 +6,7 @@ lmb_require('limb/core/src/lmbHandle.class.php');
 
 class SyncmanApplication extends lmbFilterChain
 {
-  function process()
+  function __construct()
   {
     $this->registerFilter(new lmbHandle('limb/web_app/src/filter/lmbUncaughtExceptionHandlingFilter'));
     $this->registerFilter(new lmbHandle('limb/web_app/src/filter/lmbSessionStartupFilter'));
@@ -15,7 +15,5 @@ class SyncmanApplication extends lmbFilterChain
     $this->registerFilter(new lmbHandle('limb/web_app/src/filter/lmbResponseTransactionFilter'));
     $this->registerFilter(new lmbHandle('limb/web_app/src/filter/lmbActionPerformingFilter'));
     $this->registerFilter(new lmbHandle('limb/web_app/src/filter/lmbViewRenderingFilter'));
-
-    parent :: process();
   }
 }
