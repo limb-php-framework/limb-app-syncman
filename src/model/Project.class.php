@@ -80,7 +80,6 @@ class Project extends lmbObject
 
   function rexec($cmd, $listener = null)
   {
-
     $this->lock();
 
     $this->listener = $listener;
@@ -104,7 +103,7 @@ class Project extends lmbObject
     if(!$taskman_script)
       throw new Exception("'taskman_script' property is missing");
 
-    $this->rexec("$taskman_script $cmd");
+    $this->rexec("$taskman_script $cmd", $listener);
   }
 
   function diff($revision1, $revision2 = 'HEAD', $listener = null)
@@ -475,6 +474,7 @@ class Project extends lmbObject
     if(!$cmd)
       return;
 
+    //var_dump($cmd);
     $proc = popen("$cmd 2>&1", 'r');
 
     $log = $this->_writeOutputInLog($proc, $cmd);
