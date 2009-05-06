@@ -182,6 +182,11 @@ class Project extends lmbObject
     return false;
   }
 
+  function getSharedWc()
+  {
+    return $this->_getRaw('shared_wc');
+  }
+
   function getPresyncCmd()
   {
     return $this->_getFilled('presync_cmd');
