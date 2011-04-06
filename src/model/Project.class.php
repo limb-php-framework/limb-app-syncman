@@ -48,7 +48,7 @@ class Project extends lmbObject
     return new Project($name, new lmbConf($conf));
   }
 
-  function sync($listener = null)
+  function sync($listener = null, $ignore_externals = false)
   {
     $this->lock();
 
@@ -64,7 +64,7 @@ class Project extends lmbObject
       if(!$this->existsWc())
         $this->_execCmd($this->getCheckoutWcCmd());
       else
-        $this->_execCmd($this->getUpdateWcCmd());
+        $this->_execCmd($this->getUpdateWcCmd($ignore_externals));
 
       if($this->needPresync())
       {
@@ -233,12 +233,19 @@ class Project extends lmbObject
     return SYNCMAN_SVN_BIN . ' co --non-interactive ' . $this->getRepository()->getPath() . ' ' . $this->getWc();
   }
 
-  function getUpdateWcCmd()
+  function getUpdateWcCmd($ignore_externals = false)
   {
     if($cmd = $this->_getFilled('update_wc_cmd'))
       return $cmd;
 
-    return SYNCMAN_SVN_BIN . ' up --non-interactive ' . $this->getWc();
+    $cmd = SYNCMAN_SVN_BIN . ' up --non-interactive ';
+    
+    if ($ignore_externals)
+      $cmd .= ' --ignore-externals ';
+      
+     $cmd .= $this->getWc();
+    
+    return $cmd;
   }
 
   function getWcRev()

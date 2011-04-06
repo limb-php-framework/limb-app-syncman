@@ -21,8 +21,12 @@
           elseif(isset($_REQUEST['ids']))  
           {
             $id = 'ids[]='.implode('ids[]=', array_map('urlencode', $_REQUEST['ids']));
-          }    
-          echo "<iframe width='100%' height='70px' src='".LIMB_HTTP_BASE_PATH."projects/start_sync?{$id}'></iframe>";
+          }
+          
+          $ignore_externals = (bool)@$_REQUEST['ignore-externals'];
+          $ignore_externals = $ignore_externals ? '&ignore-externals=true' : ''; 
+          
+          echo "<iframe width='100%' height='70px' src='".LIMB_HTTP_BASE_PATH."projects/start_sync?{$id}{$ignore_externals}'></iframe>";
         ?>
     </fieldset>
   

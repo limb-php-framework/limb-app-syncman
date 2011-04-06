@@ -35,11 +35,16 @@
       </dl>
     </td>
     <td class='actions'>
+      <? if($project->getRepository()->getType() == 'svn') { ?>
+        <input type='checkbox' name='ignore_externals[]' class="ignore_externals_checkbox" value='{$project.name}' checked='checked' title='Ignore externals'/>
+      <? } ?>
+      
       <? if($project->is_locked) {?>
         <a href="{{route_url params='action:unlock,id:{$project.name}'}}"  onclick="res = confirm('Confirm action: unlock project \'{$project.name}\'.');if(res){w = window.open(this.href, 'Unlock', 'toolbar=0,location=0,width=400px,height=400px');w.focus();};return false"><img src="images/icon/unlock.gif" alt="Unlock" title="Force unlock"/></a>
-      <? } else { ?>
-        <a href="{{route_url params='action:sync'}}?id={$project.name}" onclick="res = confirm('Confirm action: synchronize project \'{$project.name}\' with remote.');if(res){w = window.open(this.href, 'Sync!', 'toolbar=0,location=0,width=800px,height=800px');w.focus();};return false"><img src="images/icon/sync.gif" alt="Sync!" title="Synchronize project with remote"/></a>
+      <? } else {?>
+        <a href="{{route_url params='action:sync'}}?id={$project.name}&ignore-externals=true" class="sync_link" onclick="res = confirm('Confirm action: synchronize project \'{$project.name}\' with remote.');if(res){w = window.open(this.href, 'Sync!', 'toolbar=0,location=0,width=800px,height=800px');w.focus();};return false"><img src="images/icon/sync.gif" alt="Sync!" title="Synchronize project with remote"/></a>
       <? } ?>
+      
       <a href="{{route_url params='action:diff,id:{$project.name}'}}"  onclick="w = window.open(this.href, 'Diff', 'toolbar=0,location=0,width=800px,height=800px');w.focus();return false"><img src="images/icon/diff.gif" alt="Diff" title="Show difference"/></a>
       <? if($project->history) { ?>
         <a href="{{route_url params='action:rollback,id:{$project.name}'}}"><img src="images/icon/diff.gif" alt="rollback" title="Rollback"/></a>
@@ -52,3 +57,18 @@
 {{/list}}  
 {{/form}}
 
+{{into slot="js_include"}}
+  <script type="text/javascript">
+    jQuery(document).ready(function(){
+      jQuery('.ignore_externals_checkbox').bind('change',function(){
+        var sync_link = jQuery(this).parents('.list').find('a.sync_link')[0];
+        if( this.checked ){
+          sync_link.href += '&ignore-externals=true';
+        }else{
+          sync_link.href = sync_link.href.replace('&ignore-externals=true', '');
+        }
+        
+      })
+    });
+  </script>
+{{/into}}
