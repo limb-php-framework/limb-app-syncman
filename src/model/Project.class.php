@@ -26,9 +26,23 @@ class Project extends lmbObject
 
     foreach($conf as $key => $value)
       $this->set($key, $value);
+      
+    //-- BC for usage svn repository path as string
+    if (!is_array($conf['repository']))
+    {
+      $this->set('repository', new lmbObject(array(
+        'type' => 'svn',
+        'path' => $conf['repository'],
+      )));
+    }
+    else
+    {
+      $this->set('repository', new lmbObject($conf['repository']));  
+    }
+    
     $this->orig_conf = $conf;
   }
-
+  
   static function createFromConf($name, $conf)
   {
     return new Project($name, new lmbConf($conf));
@@ -45,7 +59,7 @@ class Project extends lmbObject
       $this->_removeOldLog();
 
       if(!$this->sync_date)
-        $this->_resetSyncDate();
+        $this->_resetSyncDate();        
 
       if(!$this->existsWc())
         $this->_execCmd($this->getCheckoutWcCmd());
@@ -63,7 +77,7 @@ class Project extends lmbObject
       if($this->getHistory())
         $this->_syncHistory();
 
-      $this->_execCmd($this->getSyncCmd());
+      //$this->_execCmd($this->getSyncCmd());
 
       $this->_execCmd($this->getPostsyncCmd());
 
@@ -216,8 +230,7 @@ class Project extends lmbObject
   {
     if($cmd = $this->_getFilled('checkout_wc_cmd'))
       return $cmd;
-
-    return SYNCMAN_SVN_BIN . ' co --non-interactive ' . $this->getRepository() . ' ' . $this->getWc();
+    return SYNCMAN_SVN_BIN . ' co --non-interactive ' . $this->getRepository()->getPath() . ' ' . $this->getWc();
   }
 
   function getUpdateWcCmd()
@@ -235,19 +248,39 @@ class Project extends lmbObject
 
   function getRepositoryRev()
   {
-    return $this->_getRev($this->getRepository());
+    return $this->_getRev($this->getRepository()->getPath());
   }
 
   protected function _getRev($path)
   {
-    preg_match('~Revision:\s*(\d+)\s+~i', $this->_svnInfo($path), $m);
-    return isset($m[1]) ? $m[1] : null;
+    /*if($this->getRepository()->getType() == 'git')
+    {
+      preg_match('~commit\s*(\w+)\s+~i', $this->_svnInfo($path), $m); 
+      return isset($m[1]) ? substr($m[1],0,10) : null;
+    }
+    else
+    {*/
+      preg_match('~Revision:\s*(\d+)\s+~i', $this->_svnInfo($path), $m);
+      return isset($m[1]) ? $m[1] : null;
+    /*}*/
   }
 
   protected function _svnInfo($path)
   {
-    $svn = SYNCMAN_SVN_BIN;
-    return `$svn info $path`;
+    /*if($this->getRepository()->getType() == 'git')
+    {
+      $git = SYNCMAN_GIT_BIN;
+      $file_dir = realpath(dirname(__FILE__));
+      chdir(substr($path,7));
+      $result = `$git log --max-count=1`;
+      chdir($file_dir); 
+      return $result;         
+    }
+    else
+    {*/
+      $svn = SYNCMAN_SVN_BIN; 
+      return `$svn info $path`;
+    /*}*/
   }
 
   function getWc()
@@ -350,7 +383,7 @@ class Project extends lmbObject
 
   function getDiffCmd($revision1, $revision2 = 'HEAD')
   {
-    return SYNCMAN_SVN_BIN . ' diff --summarize ' . '-r' . $revision1 . ':' . $revision2 . ' ' . $this->getRepository();
+    return SYNCMAN_SVN_BIN . ' diff --summarize ' . '-r' . $revision1 . ':' . $revision2 . ' ' . $this->getRepository()->getPath();
   }
 
   protected function _ssh2Connection()
@@ -478,8 +511,7 @@ class Project extends lmbObject
   {
     if(!$cmd)
       return;
-
-    //var_dump($cmd);
+    
     $proc = popen("$cmd 2>&1", 'r');
 
     $log = $this->_writeOutputInLog($proc, $cmd);
@@ -569,4 +601,3 @@ class Project extends lmbObject
     return $this->_execCmdSshNoException($cmd);
   }
 }
-
