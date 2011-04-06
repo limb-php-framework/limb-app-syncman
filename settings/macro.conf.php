@@ -1,6 +1,6 @@
 <?php
-$conf = array(
-'forcescan' => false,
-'forcecompile' => true
-);
+include_once('limb/view/settings/macro.conf.php');
+
+$conf['forcescan'] = false;
+$conf['forcecompile'] = false;
 
