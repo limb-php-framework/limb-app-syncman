@@ -25,6 +25,7 @@ class ProjectsController extends lmbController
   function doSync()
   {
     $project = Project :: findProject($this->request->get('id'));
+    $ignore_externals = (bool)$this->request->getGet('ignore-externals', false);     
   }
 
   function doSimpleSync()
@@ -74,7 +75,9 @@ class ProjectsController extends lmbController
     if($project = Project :: findProject($id))
     {
       $this->_out("<hr><b>================ Syncing " . $project->getName(). " ================</b>");
-      $project->sync($this);
+      
+      $ignore_externals = (bool)$this->request->getGet('ignore-externals', false);     
+      $project->sync($this, $ignore_externals);
     }
   }
 
