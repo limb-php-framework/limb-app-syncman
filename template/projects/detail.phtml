@@ -3,7 +3,6 @@
 {{list using="$#item.projects" as="$project"}}
   <table id='list'>
   <tr>
-    <th></th>
     <th>Name</th>
     <th>Last Sync</th>
     <th>Last Rev</th>
@@ -13,7 +12,6 @@
   </tr>
   {{list:item}}
   <tr class='list'>
-    <td class='selector'>{{input type='checkbox' name='ids[]' value='{$project.name}' class='input' /}}</td>
     <td class='project_name'>
       <a name="project_{$project->name}"></a>
       <?php $project_class = $project->is_changed ? 'changed' : 'not_changed'; ?>
@@ -53,7 +51,6 @@
   </tr>
   {{/list:item}}
   </table>
-  {{input type='submit' value='Sync!' /}}
 {{/list}}  
 {{/form}}
 

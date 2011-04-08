@@ -25,7 +25,6 @@ class ProjectsController extends lmbController
   function doSync()
   {
     $project = Project :: findProject($this->request->get('id'));
-    $ignore_externals = (bool)$this->request->getGet('ignore-externals', false);     
   }
 
   function doSimpleSync()
@@ -36,7 +35,7 @@ class ProjectsController extends lmbController
   function doPerformDiff()
   {
     $project = Project :: findProject($this->request->get('id'));
-    $project->diff($project->getLastSyncRev(), 'HEAD', $this);
+    $project->diff($project->getLastSyncRev(), $project->getRepositoryRev(), $this);
   }
 
   function doStartSync()
@@ -63,8 +62,8 @@ class ProjectsController extends lmbController
      window.top.opener.location =
       window.top.opener.location.protocol + '//' +
       window.top.opener.location.host + ':' +
-      window.top.opener.location.port + 
-      window.top.opener.location.pathname + 
+      window.top.opener.location.port +
+      window.top.opener.location.pathname +
       '?' + window.top.opener.location.search +
       '#' + '{$id_href}';
     </script>");
@@ -75,8 +74,8 @@ class ProjectsController extends lmbController
     if($project = Project :: findProject($id))
     {
       $this->_out("<hr><b>================ Syncing " . $project->getName(). " ================</b>");
-      
-      $ignore_externals = (bool)$this->request->getGet('ignore-externals', false);     
+
+      $ignore_externals = (bool)$this->request->getGet('ignore-externals', false);
       $project->sync($this, $ignore_externals);
     }
   }
