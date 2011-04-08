@@ -46,7 +46,7 @@ class SvnRepository extends lmbObject implements Repository
 
   function getLastCommitCmd($wc_path, $is_remote = false)
   {
-    $repo_path = $is_remote ? $wc_path : $this->getPath();
+    $repo_path = $is_remote ? $this->getPath() : $wc_path;
     preg_match('~Revision:\s*(\d+)\s+~i', $this->_svnInfo($repo_path), $m);
     
     return isset($m[1]) ? $m[1] : null;
