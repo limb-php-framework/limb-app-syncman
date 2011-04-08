@@ -1,6 +1,7 @@
 <?php
 lmb_require('limb/classkit/src/lmbObject.class.php');
 lmb_require('limb/util/src/system/lmbFs.class.php');
+lmb_require('src/factory/RepositoryFactory.class.php');
 
 class Project extends lmbObject
 {
@@ -11,6 +12,7 @@ class Project extends lmbObject
   protected $sync_rev;
   protected $connection;
   protected $orig_conf;
+  protected $repository;
 
   public $errors = array();
 
@@ -26,23 +28,13 @@ class Project extends lmbObject
 
     foreach($conf as $key => $value)
       $this->set($key, $value);
-      
-    //-- BC for usage svn repository path as string
-    if (!is_array($conf['repository']))
-    {
-      $this->set('repository', new lmbObject(array(
-        'type' => 'svn',
-        'path' => $conf['repository'],
-      )));
-    }
-    else
-    {
-      $this->set('repository', new lmbObject($conf['repository']));  
-    }
-    
+
+    $repository_factory = new RepositoryFactory();
+    $this->repository = $repository_factory->create($conf);
+
     $this->orig_conf = $conf;
   }
-  
+
   static function createFromConf($name, $conf)
   {
     return new Project($name, new lmbConf($conf));
@@ -59,12 +51,12 @@ class Project extends lmbObject
       $this->_removeOldLog();
 
       if(!$this->sync_date)
-        $this->_resetSyncDate();        
+        $this->_resetSyncDate();
 
       if(!$this->existsWc())
-        $this->_execCmd($this->getCheckoutWcCmd());
+        $this->_execCmd($this->getFetchProjectCmd());
       else
-        $this->_execCmd($this->getUpdateWcCmd($ignore_externals));
+        $this->_execCmd($this->getUpdateCmd($ignore_externals));
 
       if($this->needPresync())
       {
@@ -120,12 +112,12 @@ class Project extends lmbObject
     $this->rexec("$taskman_script $cmd", $listener);
   }
 
-  function diff($revision1, $revision2 = 'HEAD', $listener = null)
+  function diff($revision_wc, $resivion_remote, $listener = null)
   {
     $this->listener = $listener;
 
     $this->_removeOldDiffLog();
-    $this->_execCmd($this->getDiffCmd($revision1, $revision2), $this->getDiffFile());
+    $this->_execCmd($this->repository->getDiffCmd($this->getWc(), $revision_wc, $resivion_remote), $this->getDiffFile());
   }
 
   static function findAllProjects()
@@ -226,68 +218,30 @@ class Project extends lmbObject
     return is_dir($this->getWc());
   }
 
-  function getCheckoutWcCmd()
+  function getFetchProjectCmd()
   {
     if($cmd = $this->_getFilled('checkout_wc_cmd'))
       return $cmd;
-    return SYNCMAN_SVN_BIN . ' co --non-interactive ' . $this->getRepository()->getPath() . ' ' . $this->getWc();
+
+    return $this->repository->getFetchProjectCmd($this->getWc());
   }
 
-  function getUpdateWcCmd($ignore_externals = false)
+  function getUpdateCmd($ignore_externals = false)
   {
     if($cmd = $this->_getFilled('update_wc_cmd'))
       return $cmd;
 
-    $cmd = SYNCMAN_SVN_BIN . ' up --non-interactive ';
-    
-    if ($ignore_externals)
-      $cmd .= ' --ignore-externals ';
-      
-     $cmd .= $this->getWc();
-    
-    return $cmd;
+    return $this->repository->getUpdateCmd($this->getWc(), $ignore_externals);
   }
 
   function getWcRev()
   {
-    return $this->_getRev($this->getWc());
+    return $this->repository->getLastCommitCmd($this->getWc(), $is_remote = false);
   }
 
   function getRepositoryRev()
   {
-    return $this->_getRev($this->getRepository()->getPath());
-  }
-
-  protected function _getRev($path)
-  {
-    /*if($this->getRepository()->getType() == 'git')
-    {
-      preg_match('~commit\s*(\w+)\s+~i', $this->_svnInfo($path), $m); 
-      return isset($m[1]) ? substr($m[1],0,10) : null;
-    }
-    else
-    {*/
-      preg_match('~Revision:\s*(\d+)\s+~i', $this->_svnInfo($path), $m);
-      return isset($m[1]) ? $m[1] : null;
-    /*}*/
-  }
-
-  protected function _svnInfo($path)
-  {
-    /*if($this->getRepository()->getType() == 'git')
-    {
-      $git = SYNCMAN_GIT_BIN;
-      $file_dir = realpath(dirname(__FILE__));
-      chdir(substr($path,7));
-      $result = `$git log --max-count=1`;
-      chdir($file_dir); 
-      return $result;         
-    }
-    else
-    {*/
-      $svn = SYNCMAN_SVN_BIN; 
-      return `$svn info $path`;
-    /*}*/
+    return $this->repository->getLastCommitCmd($this->getWc(), $is_remote = true);
   }
 
   function getWc()
@@ -386,11 +340,6 @@ class Project extends lmbObject
   function getDiffFile()
   {
     return LIMB_VAR_DIR . '/.' . $this->getName() . '.diff';
-  }
-
-  function getDiffCmd($revision1, $revision2 = 'HEAD')
-  {
-    return SYNCMAN_SVN_BIN . ' diff --summarize ' . '-r' . $revision1 . ':' . $revision2 . ' ' . $this->getRepository()->getPath();
   }
 
   protected function _ssh2Connection()
@@ -518,7 +467,7 @@ class Project extends lmbObject
   {
     if(!$cmd)
       return;
-    
+
     $proc = popen("$cmd 2>&1", 'r');
 
     $log = $this->_writeOutputInLog($proc, $cmd);
