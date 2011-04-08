@@ -69,7 +69,7 @@ class Project extends lmbObject
       if($this->getHistory())
         $this->_syncHistory();
 
-      //$this->_execCmd($this->getSyncCmd());
+      $this->_execCmd($this->getSyncCmd());
 
       $this->_execCmd($this->getPostsyncCmd());
 
