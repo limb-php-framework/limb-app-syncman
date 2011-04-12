@@ -117,8 +117,17 @@ class Project extends lmbObject
   {
     $this->listener = $listener;
 
-    $this->_removeOldDiffLog();
+    $this->_removeOldDiff();
     $this->_execCmd($this->repository->getDiffCmd($this->getWc(), $revision_wc, $resivion_remote), $this->getDiffFile());
+    $this->_updateOriginRev($resivion_remote);
+  }
+  
+  function log($revision_wc, $resivion_remote, $listener = null)
+  {
+    $this->listener = $listener;
+    
+    $this->_removeOldDiffLog();
+    $this->_execCmd($this->repository->getLogCmd($this->getWc(), $revision_wc, $resivion_remote), $this->getDiffLogFile());
     $this->_updateOriginRev($resivion_remote);
   }
 
@@ -358,6 +367,11 @@ class Project extends lmbObject
   {
     return LIMB_VAR_DIR . '/.' . $this->getName() . '.diff';
   }
+  
+  function getDiffLogFile()
+  {
+    return LIMB_VAR_DIR . '/.' . $this->getName() . '.diff.log';
+  }
 
   protected function _ssh2Connection()
   {
@@ -532,10 +546,16 @@ class Project extends lmbObject
       unlink($this->getLogFile());
   }
 
-  protected function _removeOldDiffLog()
+  protected function _removeOldDiff()
   {
     if(file_exists($this->getDiffFile()))
      unlink($this->getDiffFile());
+  }
+  
+  protected function _removeOldDiffLog()
+  {
+    if(file_exists($this->getDiffLogFile()))
+      unlink($this->getDiffLogFile());
   }
 
   protected function _getFilled($name)
