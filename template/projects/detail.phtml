@@ -43,6 +43,8 @@
       
       <a href="{{route_url params='action:diff,id:{$project.name}'}}"  onclick="w = window.open(this.href, 'Diff', 'toolbar=0,location=0,width=800px,height=800px');w.focus();return false"><img src="images/icon/diff.gif" alt="Diff" title="Show difference"/></a>
       
+      <a href="{{route_url params='action:log,id:{$project.name}'}}"  onclick="w = window.open(this.href, 'Log', 'toolbar=0,location=0,width=800px,height=800px');w.focus();return false"><img src="images/icon/diff.gif" alt="Log" title="Show difference log"/></a>
+      
       <? if($project->history) { ?>
         <a href="{{route_url params='action:rollback,id:{$project.name}'}}"><img src="images/icon/diff.gif" alt="rollback" title="Rollback"/></a>
       <? } ?>

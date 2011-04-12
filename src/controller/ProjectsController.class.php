@@ -55,6 +55,30 @@ class ProjectsController extends lmbController
     
     $this->_out("<script> window.top.opener.location.reload(); </script>");
   }
+  
+  function doPerformLog()
+  {
+    $project = Project :: findProject($this->request->get('id'));    
+    
+    $repository_rev = $project->getRepositoryRev();
+    $last_sync_rev = $project->getLastSyncRev();
+    
+    $this->_out(
+      "<hr><b>
+      <table style='font-weight: bold'>
+      <tr><td>Production Rev :</td><td>" . $last_sync_rev . "</td></tr>
+      <tr><td>Origin Rev :</td><td>" . $repository_rev . "</td></tr>
+      </table>
+      </b>"
+    );    
+    
+    $project->log($last_sync_rev, $repository_rev, $this);
+    
+    if($last_sync_rev != $repository_rev)
+      $this->_out("<hr><b> Need To be Updated </b>");
+    
+    $this->_out("<script> window.top.opener.location.reload(); </script>");
+  }
 
   function doStartSync()
   {
