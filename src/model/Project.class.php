@@ -75,6 +75,7 @@ class Project extends lmbObject
 
       $this->_updateLastSyncDate();
       $this->_updateLastRev();
+      $this->_updateOriginRev($this->getRepositoryRev());
     }
     catch(Exception $e)
     {
@@ -118,6 +119,7 @@ class Project extends lmbObject
 
     $this->_removeOldDiffLog();
     $this->_execCmd($this->repository->getDiffCmd($this->getWc(), $revision_wc, $resivion_remote), $this->getDiffFile());
+    $this->_updateOriginRev($resivion_remote);
   }
 
   static function findAllProjects()
@@ -256,12 +258,12 @@ class Project extends lmbObject
 
   function getIsChanged()
   {
-    return $this->getLastSyncRev() != $this->getRepositoryRev();
+    return $this->getLastSyncRev() != $this->getOriginRev();
   }
 
   function getIsStale()
   {
-    return $this->getWcRev() != $this->getRepositoryRev();
+    return $this->getWcRev() != $this->getOriginRev();
   }
 
   function getLastSyncDateFile()
@@ -273,6 +275,11 @@ class Project extends lmbObject
   {
     return LIMB_VAR_DIR . '/.'. $this->getName() . '.rev';
   }
+  
+  function getOriginRevFile()
+  {
+    return LIMB_VAR_DIR . '/.'. $this->getName() . '.origin.rev';
+  }
 
   function getLastSyncDate()
   {
@@ -282,6 +289,16 @@ class Project extends lmbObject
   function getLastSyncRev()
   {
     return $this->_getFileContents($this->getLastSyncRevFile());
+  }
+  
+  function getOriginRev()
+  {
+    return $this->_getFileContents($this->getOriginRevFile());
+  }
+  
+  function _updateOriginRev($resivion_remote)
+  {
+    file_put_contents($this->getOriginRevFile(), $resivion_remote);
   }
 
   protected function _updateLastRev()

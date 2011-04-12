@@ -5,8 +5,7 @@
   <tr>
     <th>Name</th>
     <th>Last Sync</th>
-    <th>Last Rev</th>
-    <th>Current Rev</th>
+    <th>Rev</th>
     <th>Info</th>
     <th>Actions</th>
   </tr>
@@ -15,13 +14,12 @@
     <td class='project_name'>
       <a name="project_{$project->name}"></a>
       <?php $project_class = $project->is_changed ? 'changed' : 'not_changed'; ?>
-      <span class="{$project_class}" onclick='info_toggle("{$project.name}_info"); return false;'>
-          {$project->name}
-      </span>
+      <span class="{$project_class}" onclick='info_toggle("{$project.name}_info"); return false;'> 
+        {$project->name}
+      </span> 
     </td>
     <td>{$project.last_sync_date}</td>
-    <td>{$project.last_sync_rev}</td>
-    <td>{$project.repository_rev}</td>
+    <td>{$project.last_sync_rev}</td> 
     <td width='50%'>
       <a href='#' id='{$project.name}_info_toggle' onclick='info_toggle("{$project.name}_info"); return false;'><img src="images/icon/plus.gif"  width='10' height='10' alt='plus'/></a>
       <dl id='{$project.name}_info' class='info'>
@@ -44,6 +42,7 @@
       <? } ?>
       
       <a href="{{route_url params='action:diff,id:{$project.name}'}}"  onclick="w = window.open(this.href, 'Diff', 'toolbar=0,location=0,width=800px,height=800px');w.focus();return false"><img src="images/icon/diff.gif" alt="Diff" title="Show difference"/></a>
+      
       <? if($project->history) { ?>
         <a href="{{route_url params='action:rollback,id:{$project.name}'}}"><img src="images/icon/diff.gif" alt="rollback" title="Rollback"/></a>
       <? } ?>
