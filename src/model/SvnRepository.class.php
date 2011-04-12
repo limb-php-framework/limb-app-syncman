@@ -41,7 +41,12 @@ class SvnRepository extends lmbObject implements Repository
 
   function getDiffCmd($wc_path, $revision_wc, $resivion_remote)
   {
-    return SYNCMAN_SVN_BIN . ' diff --summarize ' . '-r' . $revision_wc . ':HEAD ' . $this->getPath();
+    return SYNCMAN_SVN_BIN . ' diff --summarize -r' . $revision_wc . ':HEAD ' . $this->getPath();
+  }
+  
+  function getLogCmd($wc_path, $revision_wc, $resivion_remote)
+  {
+    return SYNCMAN_SVN_BIN . ' log -r' . $revision_wc . ':HEAD ' . $this->getPath();
   }
 
   function getLastCommitCmd($wc_path, $is_remote = false)

@@ -47,6 +47,17 @@ class GitRepository extends lmbObject implements Repository
       
     return $cmd;
   }
+  
+  function getLogCmd($wc_path, $revision_wc, $resivion_remote)
+  {
+    $cmd =
+      'cd ' . $wc_path . ' && ' .
+      SYNCMAN_GIT_BIN . ' fetch origin && ' .
+      SYNCMAN_GIT_BIN . ' log ' . $revision_wc . '..' . $resivion_remote
+    ;
+      
+    return $cmd;
+  }
 
   function getLastCommitCmd($wc_path, $is_remote = false)
   {
