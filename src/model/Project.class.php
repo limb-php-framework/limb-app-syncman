@@ -118,7 +118,12 @@ class Project extends lmbObject
     $this->listener = $listener;
 
     $this->_removeOldDiff();
-    $this->_execCmd($this->repository->getDiffCmd($this->getWc(), $revision_wc, $resivion_remote), $this->getDiffFile());
+    
+    if($revision_wc == null)
+      echo "<hr><b> Operation impossible. Working copy doesn't exist </b>";
+    else
+      $this->_execCmd($this->repository->getDiffCmd($this->getWc(), $revision_wc, $resivion_remote), $this->getDiffFile());
+    
     $this->_updateOriginRev($resivion_remote);
   }
   
@@ -127,7 +132,12 @@ class Project extends lmbObject
     $this->listener = $listener;
     
     $this->_removeOldDiffLog();
-    $this->_execCmd($this->repository->getLogCmd($this->getWc(), $revision_wc, $resivion_remote), $this->getDiffLogFile());
+    
+    if($revision_wc == null)
+      echo "<hr><b> Operation impossible. Working copy doesn't exist </b>";
+    else
+      $this->_execCmd($this->repository->getLogCmd($this->getWc(), $revision_wc, $resivion_remote), $this->getDiffLogFile());
+    
     $this->_updateOriginRev($resivion_remote);
   }
 
@@ -266,8 +276,14 @@ class Project extends lmbObject
   }
 
   function getIsChanged()
-  {
-    return $this->getLastSyncRev() != $this->getOriginRev();
+  { 
+    $last_sync_rev = $this->getLastSyncRev(); 
+    $origin_rev = $this->getOriginRev();     
+  
+    if($last_sync_rev == '' && $origin_rev == '')
+      return true;
+    else
+      return $last_sync_rev != $origin_rev;
   }
 
   function getIsStale()
