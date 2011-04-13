@@ -27,7 +27,7 @@ class GitRepository extends lmbObject implements Repository
     return SYNCMAN_GIT_BIN . ' clone ' . $this->getPath() . ' ' . $wc_path;
   }
 
-  function getUpdateCmd($wc_path, $ignore_externals)
+  function getUpdateCmd($wc_path, $ignore_externals = false)
   {
     $cmd =
       'cd ' . $wc_path . ' && ' .
