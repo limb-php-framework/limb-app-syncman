@@ -15,6 +15,11 @@ class ProjectsController extends lmbController
       $this->view->set('category_detail', $_COOKIE['category_detail']);
     else
       $this->view->set('category_detail', array());
+
+    if(isset($_COOKIE['project_detail']))
+      $this->view->set('project_detail', $_COOKIE['project_detail']);
+    else
+      $this->view->set('project_detail', array());
   }
 
   function doSimple()
@@ -34,7 +39,7 @@ class ProjectsController extends lmbController
 
   function doPerformDiff()
   {
-    $project = Project :: findProject($this->request->get('id'));    
+    $project = Project :: findProject($this->request->get('id'));
     
     $repository_rev = $project->getRepositoryRev();
     $last_sync_rev = $project->getLastSyncRev();
@@ -53,12 +58,13 @@ class ProjectsController extends lmbController
     if($last_sync_rev != $repository_rev)
       $this->_out("<hr><b> Need To be Updated </b>");
     
-    $this->_out("<script> window.top.opener.location.reload(); </script>");
+    $id_href = $this->request->get('id');
+    $this->_reload($id_href);
   }
   
   function doPerformLog()
   {
-    $project = Project :: findProject($this->request->get('id'));    
+    $project = Project :: findProject($this->request->get('id'));
     
     $repository_rev = $project->getRepositoryRev();
     $last_sync_rev = $project->getLastSyncRev();
@@ -70,14 +76,15 @@ class ProjectsController extends lmbController
       <tr><td>Origin Rev :</td><td>" . $repository_rev . "</td></tr>
       </table>
       </b>"
-    );    
+    );
     
     $project->log($last_sync_rev, $repository_rev, $this);
     
     if($last_sync_rev != $repository_rev)
       $this->_out("<hr><b> Need To be Updated </b>");
     
-    $this->_out("<script> window.top.opener.location.reload(); </script>");
+    $id_href = $this->request->get('id');
+    $this->_reload($id_href);
   }
 
   function doStartSync()
@@ -99,15 +106,14 @@ class ProjectsController extends lmbController
     }
 
     $this->_out("<hr><b>Done!(check logs for errors)</b><br><br>");
+    $this->_reload($id_href);
+  }
+  
+  protected function _reload($id_href)
+  {
     $this->_out("<script>
-     window.top.opener.location.reload();
-     window.top.opener.location =
-      window.top.opener.location.protocol + '//' +
-      window.top.opener.location.host + ':' +
-      window.top.opener.location.port +
-      window.top.opener.location.pathname +
-      '?' + window.top.opener.location.search +
-      '#' + '{$id_href}';
+      window.top.opener.location.reload();
+      window.top.opener.location.hash = '#project_{$id_href}';
     </script>");
   }
 
@@ -211,4 +217,3 @@ class ProjectsController extends lmbController
     flush();
   }
 }
-
