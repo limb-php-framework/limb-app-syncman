@@ -24,14 +24,18 @@ function category_toggle (elem_selector, display){
       jQuery(name_toggle).find('img').attr('src','images/icon/close.gif');
 }
 
-function info_toggle (elem_selector){
-  var elem = document.getElementById(elem_selector);
-  var toggle = jQuery(elem).toggle();    
-  var name_toggle = document.getElementById(elem_selector + '_toggle');
-  if (toggle.css('display') != 'block')
-     { jQuery(name_toggle).find('img').attr('src','images/icon/plus.gif');}
-  else 
-      {jQuery(name_toggle).find('img').attr('src','images/icon/minus.gif');}
-      
+function info_toggle (projectName){
+  var elemSelector = projectName + '_info';
+  var elem = document.getElementById(elemSelector);
+  var toggle = jQuery(elem).toggle();
+  var nameToggle = document.getElementById(elemSelector + '_toggle');
+
+  if (toggle.css('display') != 'block'){
+    jQuery(nameToggle).find('img').attr('src','images/icon/plus.gif');
+    console.log( jQuery.cookie('project_detail[' + projectName + ']', null) );
+  }else{
+    jQuery(nameToggle).find('img').attr('src','images/icon/minus.gif');
+    console.log( jQuery.cookie('project_detail[' + projectName + ']', '1', { expires: 30 }) );
+  }
 }
 

@@ -3,6 +3,7 @@
   {{insert:into slot='head'}}
 <script src="js/prototype.js"></script>
 <script src="js/jquery.js"></script>
+<script src="js/jquery.cookie.js"></script>
 <script src="js/main.js"></script>
 <script src="js/getDetailForCategory.js"></script>
   {{/insert:into}}
@@ -30,7 +31,7 @@
          <div id='{$item.name}_category'>
          <?php if($open == 1) { ?>
           <?php $this->item = $item; ?>
-          {{include file='projects/detail.phtml' /}}
+          {{include file='projects/detail.phtml' project_detail="{$#project_detail}"/}}
          <?php } ?>
          </div>
 
