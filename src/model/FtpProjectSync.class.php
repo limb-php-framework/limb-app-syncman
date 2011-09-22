@@ -16,7 +16,7 @@ class FtpProjectSync extends lmbObject implements ProjectSync
     $cmd =
       SYNCMAN_FTP_BIN . ' -c "set ftp:list-options -a;
         open ftp://' . $this->_server_conf['user'] . ':' . $this->_server_conf['password'] . '@' . $this->_server_conf['host'] . ';
-        mirror --reverse --delete --dereference --only-newer --verbose ' . $sync_opts . ' ' . $local_dir . ' ' . $remote_dir . '"'
+        mirror --reverse --delete --dereference --only-newer --verbose --exclude=var/' . $sync_opts . ' ' . $local_dir . ' ' . $remote_dir . '"'
     ;
 
     return $cmd;
