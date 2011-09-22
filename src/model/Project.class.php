@@ -123,7 +123,7 @@ class Project extends lmbObject
 
       $this->_resetSyncRev();
 
-      if($this->getHistory())
+      if($this->needHistory())
         $this->_syncHistory();
 
       $this->_execCmd($this->getSyncCmd());
@@ -177,13 +177,9 @@ class Project extends lmbObject
     $this->_removeOldDiff();
 
     if($revision_wc == null)
-    {
       echo "<hr><b> Operation impossible. Working copy doesn't exist </b>";
-    }
     else
-    {
       $this->_execCmd($this->repository->getDiffCmd($this->getWc(), $revision_wc, $resivion_remote), $this->getLastDiffFile());
-    }
 
     $this->_updateOriginRev($resivion_remote);
   }
@@ -271,6 +267,11 @@ class Project extends lmbObject
     if(!$this->has('presync') || $this->_getRaw('presync') == true)
       return true;
     return false;
+  }
+
+  function needHistory()
+  {
+    return ($this->getHistory() && (!isset($this->prepared_conf['type_sync']) || $this->prepared_conf['type_sync'] != 'ftp'));
   }
 
   function getSharedWc()
