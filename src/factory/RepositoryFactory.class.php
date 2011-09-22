@@ -5,7 +5,7 @@ lmb_require('src/model/GitRepository.class.php');
 
 class RepositoryFactory extends lmbObject
 {
-  function create(lmbConf $conf)
+  static function create($conf)
   {
     //-- BC for usage svn repository path as string
     if (!is_array($conf['repository']))

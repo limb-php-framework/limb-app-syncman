@@ -21,6 +21,7 @@ define('SYNCMAN_VERSION', trim(file_get_contents(dirname(__FILE__) . '/VERSION')
 @define('SYNCMAN_SVN_BIN', 'svn');
 @define('SYNCMAN_RSYNC_BIN', 'rsync');
 @define('SYNCMAN_SSH_BIN', 'ssh');
+@define('SYNCMAN_FTP_BIN', 'lftp');
 
 @define('LIMB_CONF_INCLUDE_PATH', dirname(__FILE__) . '/settings/');
 
