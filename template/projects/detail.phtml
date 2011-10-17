@@ -1,4 +1,6 @@
-<?php $action_form = lmbToolkit :: instance()->getRoutesUrl(array('action'=>'sync'), '', false); ?>
+<?php 
+  $action_form = lmbToolkit :: instance()->getRoutesUrl(array('action'=>'sync'), '', false); 
+?>
 
 {{form name='list_form' target="sync_popup" action="{$action_form}" method='post' onSubmit="var w = window.open('', this.target, 'toolbar=0,location=0,width=800px,height=800px,scrollbars=1'); w.focus(); return true;"}}
 

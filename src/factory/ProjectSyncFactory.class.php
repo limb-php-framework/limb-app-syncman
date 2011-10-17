@@ -16,3 +16,4 @@ class ProjectSyncFactory extends lmbObject
     return new RSyncProjectSync($conf['server']);
   }
 }
+
