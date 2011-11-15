@@ -6,10 +6,12 @@ lmb_require('src/model/Repository.interface.php');
 class GitRepository extends lmbObject implements Repository
 {
   protected $_path;
+  protected $_branch;
 
-  function __construct($path)
+  function __construct($path, $branch = 'master')
   {
     $this->_path = $path;
+    $this->_branch = $branch;
   }
 
   function getPath()
@@ -21,17 +23,37 @@ class GitRepository extends lmbObject implements Repository
   {
     return 'git';
   }
+  
+  function getBranch()
+  {
+    return $this->_branch; 
+  }
 
   function getFetchProjectCmd($wc_path)
   {
-    return SYNCMAN_GIT_BIN . ' clone ' . $this->getPath() . ' ' . $wc_path;
+    $path = $this->getPath();
+    $branch = $this->getBranch();
+    
+    $cmd =
+      "mkdir {$wc_path} && " .
+      "cd {$wc_path} && " .
+      SYNCMAN_GIT_BIN . " init . && " .
+      SYNCMAN_GIT_BIN . " remote add origin {$path} && " .
+      SYNCMAN_GIT_BIN . " fetch origin && " .
+      SYNCMAN_GIT_BIN . " branch --track {$branch} origin/{$branch} && " .
+      SYNCMAN_GIT_BIN . " checkout {$branch} && " .
+      SYNCMAN_GIT_BIN . " pull origin {$branch}"
+    ;
+
+    return $cmd;
   }
 
   function getUpdateCmd($wc_path, $ignore_externals = false)
   {
     $cmd =
       'cd ' . $wc_path . ' && ' .
-      SYNCMAN_GIT_BIN . ' pull origin master'
+      SYNCMAN_GIT_BIN . ' fetch origin && ' .
+      SYNCMAN_GIT_BIN . ' pull origin ' . $this->getBranch()
     ;
 
     return $cmd;
@@ -72,7 +94,8 @@ class GitRepository extends lmbObject implements Repository
       $cmd =
         'cd ' . $wc_path . ' && ' .
         SYNCMAN_GIT_BIN . ' fetch origin && ' .
-        SYNCMAN_GIT_BIN . ' log --max-count=1 origin master'
+        SYNCMAN_GIT_BIN . ' fetch origin && '.
+        SYNCMAN_GIT_BIN . ' log --max-count=1 origin ' . $this->getBranch()
       ;
     }
     else
