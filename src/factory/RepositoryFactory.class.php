@@ -14,7 +14,8 @@ class RepositoryFactory extends lmbObject
     if ($conf['repository']['type'] == 'svn')
       return new SvnRepository($conf['repository']['path']);
 
-    return new GitRepository($conf['repository']['path']);
+    $branch = isset($conf['repository']['branch']) ? $conf['repository']['branch'] : 'master'; 
+    return new GitRepository($conf['repository']['path'], $branch);
   }
 }
 
