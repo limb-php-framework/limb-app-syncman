@@ -61,7 +61,7 @@ class ProjectsController extends lmbController
     $id_href = $this->request->get('id');
     $this->_reload($id_href);
   }
-  
+
   function doPerformLog()
   {
     $project = Project :: findProject($this->request->get('id'));
@@ -85,6 +85,22 @@ class ProjectsController extends lmbController
     
     $id_href = $this->request->get('id');
     $this->_reload($id_href);
+  }
+
+  function doCheckoutBranch()
+  {
+    $project = Project :: findProject($this->request->get('id'));
+
+    if($project->getRepository()->getType() != 'git')
+      return;
+
+    if(!$this->request->hasPost())
+      return;
+
+    $branch = $this->request->getPost('branch', 'master');
+    $new_project = $project->checkoutBranch($branch, $this);
+
+    $this->redirect(LIMB_HTTP_BASE_PATH . 'projects/sync?id=' . $new_project->getName());
   }
 
   function doStartSync()

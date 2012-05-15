@@ -12,6 +12,7 @@ $conf = array(
     //-- allowed types: git, svn
     'type' => 'git',
     'path' => 'myrepos/projectA/',
+    'branch' => 'project_branch',
   ),
 
   //-- allowed types: rsync, ftp
