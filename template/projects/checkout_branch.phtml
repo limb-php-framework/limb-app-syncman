@@ -1,0 +1,29 @@
+<html>
+<head>
+  <title>Syncman projects</title>
+  <meta http-equiv='Content-Type' content='text/html; charset=utf-8'/>
+  <base href="<?php echo LIMB_HTTP_BASE_PATH; ?>"/>
+  <link rel="stylesheet" href="styles/main.css" type="text/css" />
+</head>
+<body id='popup'>
+
+  <div id="wrapper">
+
+    <div id="head">
+      <img src="images/logo.syncman.small.gif"  width='159' height='40' alt='SYNCMAN' id='logo'/>
+    </div>
+
+    {{form id="branch_form" name="branch_form" method="post"}}
+
+      <fieldset class="form">
+         <legend>Checkout Branch</legend>
+         <input tupe="text" id="branch" name="branch" /><br/>
+         <input type="submit" value="Submit"/>
+      </fieldset>
+
+    {{/form}}
+
+  </div>
+
+</body>
+</html>

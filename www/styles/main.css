@@ -54,8 +54,10 @@
     #logo {margin: 17px 0 17px 47px;}
     
   #popup fieldset {height:85%}
+    #popup fieldset.form {height:10%}
     #popup iframe {background: #fff;height:95%;}
     #popup .content {background: #fff;height:95%;}
+    #popup #branch {width:100%;}
 
   #list {border:0;width:100%;margin: 0 0 10px;}
   #list th {background: #2a3f62 url(../images/bgr/th.gif) repeat-x center bottom;height:32px;vertical-align:top;padding: 2px 5px 10px;}
