@@ -183,7 +183,7 @@ class Project extends lmbObject
 
     $this->_updateOriginRev($resivion_remote);
   }
-  
+
   function log($revision_wc, $resivion_remote, $listener = null)
   {
     $this->listener = $listener;
@@ -198,6 +198,21 @@ class Project extends lmbObject
     $this->_updateOriginRev($resivion_remote);
   }
 
+  function checkoutBranch($branch, $listener = null)
+  {
+    $this->listener = $listener;
+    $settings_dir = $this->getSettingsDir();
+    $name = $this->getName();
+
+    $content = '<?php' . PHP_EOL . '$conf[\'repository\'][\'branch\'] = \'' . $branch . '\';' . PHP_EOL;
+    file_put_contents($settings_dir . '/settings.conf.override.php', $content);
+
+    $this->_removeLocalDir();
+    $this->_removeWC();
+
+    return self :: createFromConf($name, $settings_dir . '/settings.conf.php');
+  }
+
   static function findAllProjects()
   {
     $projects = array();
@@ -206,7 +221,7 @@ class Project extends lmbObject
       if($item{0} == '.' || !is_dir(SYNCMAN_PROJECTS_SETTINGS_DIR . '/' . $item))
         continue;
 
-      $project = self :: createFromConf($item, SYNCMAN_PROJECTS_SETTINGS_DIR . '/' . $item . '/settings.conf.php');
+      $project = self :: createFromConf($item, SYNCMAN_PROJECTS_SETTINGS_DIR . $item . '/settings.conf.php');
       $projects[] = $project;
     }
     return $projects;
@@ -241,6 +256,11 @@ class Project extends lmbObject
   {
     lmbFs :: mkdir(LIMB_VAR_DIR . '/projects/');
     return LIMB_VAR_DIR . '/projects/' .$this->getName();
+  }
+
+  protected function _removeLocalDir()
+  {
+    return lmbFs :: rm($this->getLocalDir());
   }
 
   function getSettingsDir()
@@ -338,6 +358,14 @@ class Project extends lmbObject
       return LIMB_VAR_DIR . '/wc/' . $shared_wc;
     else
       return LIMB_VAR_DIR . '/wc/' . $this->getName();
+  }
+
+  protected function _removeWC()
+  {
+    if($this->existsWc())
+      return lmbFs :: rm($this->getWc());
+
+    return true;
   }
 
   function getIsChanged()

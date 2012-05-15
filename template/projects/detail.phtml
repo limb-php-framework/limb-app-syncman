@@ -52,8 +52,11 @@
           <? } ?>
 
           <a href="{{route_url params='action:diff,id:{$project.name}'}}"  onclick="return diff.call(this);"><img src="images/icon/diff.gif" alt="Diff" title="Show difference"/></a>
-
           <a href="{{route_url params='action:log,id:{$project.name}'}}"  onclick="return log.call(this);"><img src="images/icon/log.gif" alt="Log" title="Show difference log"/></a>
+
+          <? if($project->getRepository()->getType() == 'git') { ?>
+            <a href="{{route_url params='action:checkout_branch,id:{$project.name}'}}" onclick="return branch.call(this);"><img src="images/icon/branch.png" alt="Branch" title="Checkout branch"/></a>
+          <? } ?>
 
           <? if($project->needHistory()) { ?>
             <a href="{{route_url params='action:rollback,id:{$project.name}'}}"><img src="images/icon/diff.gif" alt="rollback" title="Rollback"/></a>
@@ -106,6 +109,12 @@
 
     function log(){
       w = window.open(this.href, 'Log', 'toolbar=0,location=0,width=800px,height=800px');
+      w.focus();
+      return false;
+    }
+
+    function branch(){
+      w = window.open(this.href, 'Checkout Branch', 'toolbar=0,location=0,width=800px,height=800px');
       w.focus();
       return false;
     }
