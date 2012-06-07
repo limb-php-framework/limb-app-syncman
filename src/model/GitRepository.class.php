@@ -94,8 +94,7 @@ class GitRepository extends lmbObject implements Repository
       $cmd =
         'cd ' . $wc_path . ' && ' .
         SYNCMAN_GIT_BIN . ' fetch origin && ' .
-        SYNCMAN_GIT_BIN . ' fetch origin && '.
-        SYNCMAN_GIT_BIN . ' log --max-count=1 origin ' . $this->getBranch()
+        SYNCMAN_GIT_BIN . ' log --max-count=1 origin/' . $this->getBranch()
       ;
     }
     else
@@ -105,7 +104,7 @@ class GitRepository extends lmbObject implements Repository
         SYNCMAN_GIT_BIN . ' log --max-count=1'
       ;  
     }
-    
+
     return `$cmd`;
   }
 }
