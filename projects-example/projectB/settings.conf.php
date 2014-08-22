@@ -1,12 +1,22 @@
 <?php
 
 $conf = array(
-  'server' => array(
-    'host' => 'myhost.com',
-    'user' => 'syncman',
-    'port' => 22,
-    'key' => '/home/syncman/.ssh/id_dsa',
-    'remote_dir' => '/var/www/projectB',
+
+  'servers' => array(
+    array(
+      'host' => 'myhost.com',
+      'user' => 'syncman',
+      'port' => 22,
+      'key' => '/home/syncman/.ssh/id_dsa',
+      'remote_dir' => '/var/www/projectB',
+    ),
+    array(
+      'host' => 'mysecondhost.com',
+      'user' => 'syncman',
+      'port' => 22,
+      'key' => '/home/syncman/.ssh/id_dsa',
+      'remote_dir' => '/var/www/projectB',
+    ),
   ),
 
   'repository' => array(
@@ -17,7 +27,7 @@ $conf = array(
 
   //-- allowed types: rsync, ftp
   'type_sync' => 'rsync',
-  
+
   'presync_cmd' => 'php %local_dir%/cli/pre_sync.php',
   'postsync_cmd' => 'ssh -i %key% %user%@%host% \'php %remote_dir%/cli/post_sync.php\'',
 

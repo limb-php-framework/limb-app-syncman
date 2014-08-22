@@ -5,15 +5,15 @@ lmb_require('src/model/FtpProjectSync.class.php');
 
 class ProjectSyncFactory extends lmbObject
 {
-  static function create($conf)
+  static function create($server_conf, $type_sync = null)
   {
-    if(isset($conf['type_sync']))
+    if($type_sync)
     {
-      if($conf['type_sync'] == 'ftp')
-        return new FtpProjectSync($conf['server']);
+      if($type_sync == 'ftp')
+        return new FtpProjectSync($server_conf);
     }
 
-    return new RSyncProjectSync($conf['server']);
+    return new RSyncProjectSync($server_conf);
   }
 }
 
