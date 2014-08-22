@@ -13,9 +13,9 @@ class Project extends lmbObject
   protected $sync_rev;
   protected $connection;
   protected $orig_conf;
-  protected $prepared_conf;
   protected $repository;
-  protected $server;
+  protected $servers;
+  protected $current_server;
 
   public $errors = array();
 
@@ -29,13 +29,34 @@ class Project extends lmbObject
     $new_default_conf = $this->_prepareConf(self::$default_conf);
     $this->_setProjectParams($new_default_conf);
 
-    $this->prepared_conf = $this->_prepareConf($conf);
-    $this->_setProjectParams($this->prepared_conf);
+    $prepared_conf = $this->_prepareConf($conf);
+    $this->_setProjectParams($prepared_conf);
 
-    $this->repository = RepositoryFactory :: create($this->prepared_conf);
+    $this->repository = RepositoryFactory :: create($prepared_conf);
 
     $this->orig_conf = $conf;
-    $this->server = $this->getServer();
+  }
+
+  function getServer()
+  {
+    if ($this->current_server)
+      return $this->current_server;
+
+    $first_server = array_shift(array_slice($this->servers, 0, 1));
+    $this->setServer($first_server);
+
+    return $first_server;
+  }
+
+  function setServer($server)
+  {
+    $this->current_server = $server;
+  }
+
+  function getServerParam($param)
+  {
+    $server = $this->getServer();
+    return $server[$param];
   }
 
   protected function _prepareConf($conf)
@@ -43,44 +64,38 @@ class Project extends lmbObject
     foreach($conf as $key => $value)
       $new_conf[$key] = $value;
 
-    if(!isset($new_conf['server']))
+    if(!isset($new_conf['server']) && !isset($new_conf['servers']))
     {
       $new_conf['server'] = array();
-      if(isset($new_conf['user']))
-      {
-        $new_conf['server']['user'] = $new_conf['user'];
-        unset($new_conf['user']);
-      }
 
-      if(isset($new_conf['host']))
-      {
-        $new_conf['server']['host'] = $new_conf['host'];
-        unset($new_conf['host']);
-      }
+      $new_conf = $this->_prepareConfServerOption($new_conf, 'user');
+      $new_conf = $this->_prepareConfServerOption($new_conf, 'host');
+      $new_conf = $this->_prepareConfServerOption($new_conf, 'port');
+      $new_conf = $this->_prepareConfServerOption($new_conf, 'key');
+      $new_conf = $this->_prepareConfServerOption($new_conf, 'password');
+      $new_conf = $this->_prepareConfServerOption($new_conf, 'remote_dir');
+    }
 
-      if(isset($new_conf['port']))
-      {
-        $new_conf['server']['port'] = $new_conf['port'];
-        unset($new_conf['port']);
-      }
+    if(!isset($new_conf['servers']))
+      $new_conf['servers'] = array();
 
-      if(isset($new_conf['key']))
-      {
-        $new_conf['server']['key'] = $new_conf['key'];
-        unset($new_conf['key']);
-      }
+    if(isset($new_conf['server']))
+    {
+      if($new_conf['server'])
+        $new_conf['servers'][] = $new_conf['server'];
 
-      if(isset($new_conf['password']))
-      {
-        $new_conf['server']['password'] = $new_conf['password'];
-        unset($new_conf['password']);
-      }
+      unset($new_conf['server']);
+    }
 
-      if(isset($new_conf['remote_dir']))
-      {
-        $new_conf['server']['remote_dir'] = $new_conf['remote_dir'];
-        unset($new_conf['remote_dir']);
-      }
+    return $new_conf;
+  }
+
+  protected function _prepareConfServerOption($new_conf, $option)
+  {
+    if(isset($new_conf[$option]))
+    {
+      $new_conf['server'][$option] = $new_conf[$option];
+      unset($new_conf[$option]);
     }
 
     return $new_conf;
@@ -115,24 +130,31 @@ class Project extends lmbObject
       else
         $this->_execCmd($this->getUpdateCmd($ignore_externals));
 
-      if($this->needPresync())
+      foreach($this->servers as $server)
       {
-        $this->_syncLocalDirWithWc();
-        $this->_execCmd($this->getPresyncCmd());
+        $this->setServer($server);
+
+        $this->listener->notify($this, '================ ' . $this->getServerParam('host') . ' ================', null);
+
+        if($this->needPresync())
+        {
+          $this->_syncLocalDirWithWc();
+          $this->_execCmd($this->getPresyncCmd());
+        }
+
+        $this->_resetSyncRev();
+
+        if($this->needHistory())
+          $this->_syncHistory();
+
+        $this->_execCmd($this->getSyncCmd());
+
+        $this->_execCmd($this->getPostsyncCmd());
+
+        $this->_updateLastSyncDate();
+        $this->_updateLastRev();
+        $this->_updateOriginRev($this->getRepositoryRev());
       }
-
-      $this->_resetSyncRev();
-
-      if($this->needHistory())
-        $this->_syncHistory();
-
-      $this->_execCmd($this->getSyncCmd());
-
-      $this->_execCmd($this->getPostsyncCmd());
-
-      $this->_updateLastSyncDate();
-      $this->_updateLastRev();
-      $this->_updateOriginRev($this->getRepositoryRev());
     }
     catch(Exception $e)
     {
@@ -150,7 +172,7 @@ class Project extends lmbObject
 
     try
     {
-      $this->_execCmd(SYNCMAN_SSH_BIN . ' -i ' . $this->server['key'] . " " . $this->getRemoteUserWithHost() . " '" . $cmd . "'");
+      $this->_execCmd(SYNCMAN_SSH_BIN . ' -i ' . $this->getServerParam('key') . " " . $this->getRemoteUserWithHost() . " '" . $cmd . "'");
     }
     catch(Exception $e)
     {
@@ -187,14 +209,14 @@ class Project extends lmbObject
   function log($revision_wc, $resivion_remote, $listener = null)
   {
     $this->listener = $listener;
-    
+
     $this->_removeOldDiffLog();
-    
+
     if($revision_wc == null)
       echo "<hr><b> Operation impossible. Working copy doesn't exist </b>";
     else
       $this->_execCmd($this->repository->getLogCmd($this->getWc(), $revision_wc, $resivion_remote), $this->getLastDiffLogFile());
-    
+
     $this->_updateOriginRev($resivion_remote);
   }
 
@@ -273,12 +295,14 @@ class Project extends lmbObject
     if($cmd = $this->_getFilled('sync_cmd'))
       return $cmd;
 
-    if(isset($this->prepared_conf['rsync_opts']) && (!isset($this->prepared_conf['type_sync']) || $this->prepared_conf['type_sync'] == 'rsync'))
+    if(isset($this->rsync_opts) && (!isset($this->type_sync) || $this->type_sync == 'rsync'))
       $sync_opts = $this->_getRaw('rsync_opts');
     else
       $sync_opts = $this->_getRaw('sync_opts');
 
-    $project_sync = ProjectSyncFactory :: create($this->prepared_conf);
+    $type_sync = isset($this->type_sync) ? $this->type_sync : null;
+    $project_sync = ProjectSyncFactory :: create($this->getServer(), $type_sync);
+
     return $project_sync->sync($this->getLocalDir(), $this->getRemoteDir(), $sync_opts);
   }
 
@@ -291,7 +315,7 @@ class Project extends lmbObject
 
   function needHistory()
   {
-    return ($this->getHistory() && (!isset($this->prepared_conf['type_sync']) || $this->prepared_conf['type_sync'] != 'ftp'));
+    return ($this->getHistory() && (!isset($this->type_sync) || $this->type_sync != 'ftp'));
   }
 
   function getSharedWc()
@@ -311,12 +335,12 @@ class Project extends lmbObject
 
   function getRemoteDir()
   {
-    return $this->server['remote_dir'] . ($this->getHistory() ? '/current' : '');
+    return $this->getServerParam('remote_dir') . ($this->getHistory() ? '/current' : '');
   }
 
   function getRemoteUserWithHost()
   {
-    return $this->server['user'] . '@' . $this->server['host'];
+    return $this->getServerParam('user') . '@' . $this->getServerParam('host');
   }
 
   function existsWc()
@@ -369,10 +393,10 @@ class Project extends lmbObject
   }
 
   function getIsChanged()
-  { 
-    $last_sync_rev = $this->getLastSyncRev(); 
-    $origin_rev = $this->getOriginRev();     
-  
+  {
+    $last_sync_rev = $this->getLastSyncRev();
+    $origin_rev = $this->getOriginRev();
+
     if($last_sync_rev == '' && $origin_rev == '')
       return true;
     else
@@ -393,7 +417,7 @@ class Project extends lmbObject
   {
     return LIMB_VAR_DIR . '/.'. $this->getName() . '.rev';
   }
-  
+
   function getOriginRevFile()
   {
     return LIMB_VAR_DIR . '/.'. $this->getName() . '.origin.rev';
@@ -408,12 +432,12 @@ class Project extends lmbObject
   {
     return $this->_getFileContents($this->getLastSyncRevFile());
   }
-  
+
   function getOriginRev()
   {
     return $this->_getFileContents($this->getOriginRevFile());
   }
-  
+
   function _updateOriginRev($resivion_remote)
   {
     file_put_contents($this->getOriginRevFile(), $resivion_remote);
@@ -476,7 +500,7 @@ class Project extends lmbObject
   {
     return LIMB_VAR_DIR . '/.' . $this->getName() . '.diff';
   }
-  
+
   function getLastDiffLogFile()
   {
     return LIMB_VAR_DIR . '/.' . $this->getName() . '.diff.log';
@@ -486,13 +510,13 @@ class Project extends lmbObject
   {
     if(function_exists('ssh2_connect'))
     {
-      $this->connection = ssh2_connect($this->server['host'], $this->server['port']);
+      $this->connection = ssh2_connect($this->getServerParam('host'), $this->getServerParam('port'));
       if(!$this->connection)
         throw new Exception("No connection to the ssh server!");
       if(!ssh2_auth_pubkey_file(
-          $this->connection, $this->server['user'],
-          $this->server['key'] . '.pub',
-          $this->server['key'], $this->server['password']))
+          $this->connection, $this->getServerParam('user'),
+          $this->getServerParam('key') . '.pub',
+          $this->getServerParam('key'), $this->getServerParam('password')))
         throw new Exception("Public Key Authentication Failed!");
     }
     else
@@ -604,7 +628,7 @@ class Project extends lmbObject
     }
     else
     {
-      $this->_execCmd(SYNCMAN_SSH_BIN . ' -i ' . $this->server['key'] . " " . $this->getRemoteUserWithHost() . " " . $cmd);
+      $this->_execCmd(SYNCMAN_SSH_BIN . ' -i ' . $this->getServerParam('key') . " " . $this->getRemoteUserWithHost() . " " . $cmd);
     }
 
     return $log;
@@ -637,6 +661,9 @@ class Project extends lmbObject
 
   protected function _fillTemplate($str)
   {
+    if(!$str)
+      return null;
+
     return str_replace(array('%wc%',
                              '%host%',
                              '%user%',
@@ -646,11 +673,11 @@ class Project extends lmbObject
                              '%settings_dir%',
                              ),
                        array($this->getWc(),
-                             $this->server['host'],
-                             $this->server['user'],
+                             $this->getServerParam('host'),
+                             $this->getServerParam('user'),
                              $this->getLocalDir(),
                              $this->getRemoteDir(),
-                             $this->server['key'],
+                             $this->getServerParam('key'),
                              $this->getSettingsDir(),
                              ),
                        $str);
@@ -667,7 +694,7 @@ class Project extends lmbObject
     if(file_exists($this->getLastDiffFile()))
      unlink($this->getLastDiffFile());
   }
-  
+
   protected function _removeOldDiffLog()
   {
     if(file_exists($this->getLastDiffLogFile()))
