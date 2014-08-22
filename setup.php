@@ -4,6 +4,8 @@ ini_set('implicit_flush', 'On');
 set_time_limit(0);
 putenv('HOME=/var/www');
 
+date_default_timezone_set('Europe/Moscow');
+ 
 set_include_path(dirname(__FILE__) . '/' . PATH_SEPARATOR .
                  dirname(__FILE__) . '/lib/' . PATH_SEPARATOR);
 
